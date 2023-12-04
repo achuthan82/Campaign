@@ -26,7 +26,7 @@ const Dashboard = () => {
         <Col md={6} lg={4}>
           <Card className="campaign-card">
             <CardBody>
-              <Row className="align-items-center mb-1">
+              <Row className="align-items-top mb-1">
                 <Col xs={10}>
                   <h5>Campaign 1</h5>
                   <p>24-11-2023 11:00 AM</p>
@@ -69,7 +69,7 @@ const Dashboard = () => {
         <Col md={6} lg={4}>
           <Card className="campaign-card" style={{backgroundColor:'rgba(70, 46, 149, 0.03)'}}>
             <CardBody>
-              <Row className="align-items-center mb-1">
+              <Row className="align-items-top mb-1">
                 <Col xs={10}>
                   <h5>Campaign 1</h5>
                   <p>24-11-2023 11:00 AM</p>
@@ -112,7 +112,7 @@ const Dashboard = () => {
         <Col md={6} lg={4}>
           <Card className="campaign-card">
             <CardBody>
-              <Row className="align-items-center mb-1">
+              <Row className="align-items-top mb-1">
                 <Col xs={10}>
                   <h5>Campaign 1</h5>
                   <p>24-11-2023 11:00 AM</p>
