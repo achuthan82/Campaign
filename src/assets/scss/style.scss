@@ -1,0 +1,50 @@
+/*================================================================================
+	Item Name: IVR - Market Place
+	Version: 2.0
+	Author: Abacies
+	Author URL: #
+================================================================================
+
+NOTE:
+------
+PLACE HERE YOUR OWN SCSS CODES AND IF NEEDED, OVERRIDE THE STYLES FROM THE OTHER STYLESHEETS.
+WE WILL RELEASE FUTURE UPDATES SO IN ORDER TO NOT OVERWRITE YOUR STYLES IT'S BETTER LIKE THIS.  */
+[dir=ltr] .vertical-layout .main-menu .navigation a.active { background: linear-gradient(118deg, #20124A,  #462E95); box-shadow: 0 0 10px 1px rgba(#314ec4, 0.7); }
+
+.main-menu .navbar-header .navbar-brand .brand-logo img { max-width: 100px; }
+.menu-collapsed .main-menu .navbar-header .navbar-brand .brand-logo img { max-width: 45px; }
+.menu-collapsed .main-menu .navbar-header .navbar-brand .brand-logo img + small { font-size: 7px; }
+
+.campaign-card {
+	border: 2px solid #462E95;
+}
+.campaign-card  p {
+	color:#462E95
+}
+.card-text-log {
+	color:#462E95 !important;
+}
+.dropzone {
+	border:2px dashed #adadad;
+	padding:2rem;
+}
+.react-tagsinput-tag{
+	background-color: rgba(70, 46, 149, 0.16) !important ;
+	color: rgba(70, 46, 149, 1) !important
+}
+
+.react-tagsinput--focused {
+	border-color: #462E95 !important;
+  }
+.nested-card {
+	background-color: rgba(70, 46, 149, 0.04);
+}
+.react-dataTable .rdt_TableHead .rdt_TableHeadRow {
+    background-color: #f3f2f7;
+    border-top: 1px solid;
+    border-color: #ebe9f1;
+	font-size: 12px;
+	font-weight:bold;
+	color:#6e6b7b;
+	text-transform: uppercase;
+ }
