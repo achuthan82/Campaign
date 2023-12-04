@@ -44,6 +44,7 @@ const UserDropdown = () => {
   if (user?.dt?.role_id === 1) role = 'Admin'
   if (user?.dt?.role_id === 2) role = 'Agent'
   if (user?.dt?.role_id === 3) role = 'Marketplace Member'
+  console.log(role)
   return (
     <UncontrolledDropdown tag="li" className="dropdown-user nav-item">
       <DropdownToggle
@@ -53,8 +54,8 @@ const UserDropdown = () => {
         onClick={(e) => e.preventDefault()}
       >
         <div className="user-nav d-sm-flex d-none">
-          <span className="user-name fw-bold">{user?.dt?.name}</span>
-          <span className="user-status">{role}</span>
+          <span className="user-name fw-bold">Kevin</span>
+          <span className="user-status">Admin</span>
         </div>
         {/* <Avatar
           img={defaultAvatar}
@@ -63,14 +64,14 @@ const UserDropdown = () => {
           status="online"
         /> */}
         {/* <Avatar color={`${states[Math.floor(Math.random() * states.length)]}`} content={activeUser.name} initials /> */}
-        <Avatar color="primary" content={user?.dt?.name} initials />
+        <Avatar color="primary" content="Kevin" initials />
           
       </DropdownToggle>
       <DropdownMenu end>
-        <DropdownItem tag={Link} to="/invoice">
+        {/* <DropdownItem tag={Link} to="/invoice">
           <User size={14} className="me-75" />
           <span className="align-middle">Profile</span>
-        </DropdownItem>
+        </DropdownItem> */}
         {/* <DropdownItem tag={Link} to="/" onClick={(e) => e.preventDefault()}>
           <Mail size={14} className="me-75" />
           <span className="align-middle">Inbox</span>

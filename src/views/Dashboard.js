@@ -27,11 +27,11 @@ const Dashboard = () => {
           <Card className="campaign-card">
             <CardBody>
               <Row className="align-items-center mb-1">
-                <Col>
+                <Col xs={10}>
                   <h5>Campaign 1</h5>
                   <p>24-11-2023 11:00 AM</p>
                 </Col>
-                <Col className="d-flex justify-content-end">
+                <Col className="d-flex justify-content-end" xs={2}>
                   <span>
                     <MoreVertical size={15}></MoreVertical>
                   </span>
@@ -70,11 +70,11 @@ const Dashboard = () => {
           <Card className="campaign-card" style={{backgroundColor:'rgba(70, 46, 149, 0.03)'}}>
             <CardBody>
               <Row className="align-items-center mb-1">
-                <Col>
+                <Col xs={10}>
                   <h5>Campaign 1</h5>
                   <p>24-11-2023 11:00 AM</p>
                 </Col>
-                <Col className="d-flex justify-content-end">
+                <Col className="d-flex justify-content-end" xs={2}>
                   <span>
                     <MoreVertical size={15}></MoreVertical>
                   </span>
@@ -113,11 +113,11 @@ const Dashboard = () => {
           <Card className="campaign-card">
             <CardBody>
               <Row className="align-items-center mb-1">
-                <Col>
+                <Col xs={10}>
                   <h5>Campaign 1</h5>
                   <p>24-11-2023 11:00 AM</p>
                 </Col>
-                <Col className="d-flex justify-content-end">
+                <Col className="d-flex justify-content-end" xs={2}>
                   <span>
                     <MoreVertical size={15}></MoreVertical>
                   </span>

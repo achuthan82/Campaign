@@ -10,7 +10,7 @@ import { useSkin } from "@hooks/useSkin"
 // ** Styles
 import "@styles/base/pages/page-misc.scss"
 
-import logo from '@src/assets/images/logo/logo.png'
+// import logo from '@src/assets/images/logo/logo.png'
 
 const Error = () => {
   // ** Hooks
@@ -22,7 +22,7 @@ const Error = () => {
     <div className="misc-wrapper">
       <a className="brand-logo" href="/">
         {/* <h2 className="brand-text text-primary ms-1">IVR - MarketPlace</h2> */}
-        <img className='app-brand' src={logo} alt='Logo' />
+        {/* <img className='app-brand' src={logo} alt='Logo' /> */}
       </a>
       <div className="misc-inner p-2 p-sm-3">
         <div className="w-100 text-center">
