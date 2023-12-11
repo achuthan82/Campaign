@@ -1,73 +1,83 @@
 // ** React Imports
-import { Link } from 'react-router-dom'
+import { Link, useParams, useNavigate } from 'react-router-dom'
 
 // ** Icons Imports
 import { ChevronLeft } from 'react-feather'
 
 // ** Reactstrap Imports
-import { Card, CardBody, CardTitle, CardText, Form, Label, Button } from 'reactstrap'
+import { Card, CardBody, CardTitle, CardText, Form, Label, Button, Spinner } from 'reactstrap'
 
 import { useForm, Controller } from 'react-hook-form'
+import axios from 'axios'
 // ** Custom Components
 import InputPasswordToggle from '@components/input-password-toggle'
+import { toast } from 'react-hot-toast'
 
 // ** Styles
 import '@styles/react/pages/page-authentication.scss'
 
 // import logo from '@src/assets/images/logo/logo.png'
-
+import apiConfig from '@configs/apiConfig'
+import { useState } from 'react'
+const ToastContent = ({ message = null }) => (
+  <>
+    {message !== null && (
+      <div className="d-flex">
+        <div className="me-1">{/* <Avatar size='sm' color='error'/> */}</div>
+        <div className="d-flex flex-column">
+          <div className="d-flex justify-content-between">
+            <span>{message}</span>
+          </div>
+        </div>
+      </div>
+    )}
+  </>
+)
 const ResetPasswordBasic = () => {
+  const navigate = useNavigate('/login')
+  const params = useParams() 
+  const token = params.token
+  console.log('token', token)
+  console.log('params', params)
   const {
     control,
     setError,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
+    getValues
   } = useForm()
-
+  const [loading, setLoading] = useState(false)
   const onSubmit = data => {
     console.log(data)
     if (Object.values(data).every(field => field.length > 0)) {
+      setLoading(true)
       const config = {
-        method: 'post',
-        url: `${apiConfig.api.url}auth/login`,
-        // headers: { 
-        //   Authorization: `Token ${getToken()}`
-        // }
-        data: { new_password: data.password, confirm_password: data.password }
+        method: 'patch',
+        url: `${apiConfig.api.url}auth/reset_password`,
+        headers: { 
+          Authorization: `Token ${token}`
+        },
+        data: { new_password: data.password, confirm_password:data.confirmPassword}
       }
 
       axios(config)
       .then(function (res) {
-        console.log(res)
-        // const dt = res.data.data
-      //   dt.ability = ability_
-      //   const data = { dt, accessToken: res.data.auth_token, refreshToken: res.data.auth_token }
-      //   // const data = { ...res.data.data, accessToken: res.data.auth_token, refreshToken: res.data.refreshToken }
-      //   dispatch(handleLogin(data))
-      //   ability.update(ability_)
-      //   let role = ''
-      //   if (res.data.data.role_id === 1) role = 'Admin'
-      //   if (res.data.data.role_id === 2) role = 'Agent'
-      //   if (res.data.data.role_id === 3) role = 'Marketplace Member'
-      //   navigate(getHomeRouteForLoggedInUser(role))
-      //   toast(t => (
-      //     <ToastContent t={t} role={(data.role_id === 1 && 'Admin') || (data.role_id === 2 && 'Agent') || (data.role_id === 3 && 'Marketplace Member')} name={data.name || data.email || 'Unknown'} />
-      //   ))
-      }).catch(err => console.log(err))
-      // https://iver-survey-system.herokuapp.com/v1
-      // useJwt
-      //   .login({ email: data.loginEmail, password: data.password })
-      //   .then(res => {
-      //     const data = { ...res.data.userData, accessToken: res.data.accessToken, refreshToken: res.data.refreshToken }
-      //     dispatch(handleLogin(data))
-      //     ability.update(res.data.userData.ability)
-      //     navigate(getHomeRouteForLoggedInUser(data.role))
-      //     toast.success(
-      //       <ToastContent name={data.fullName || data.username || 'John Doe'} role={data.role || 'admin'} />,
-      //       { icon: false, transition: Slide, hideProgressBar: true, autoClose: 2000 }
-      //     )
-      //   })
-      //   .catch(err => console.log(err))
+        setLoading(false)
+        if (res.data.status === 200) {
+          toast.success(<ToastContent message={res.data.message} />, { duration:3000 })  
+          navigate('/login')
+        } else {
+          toast.error(<ToastContent message={res.data.message} />, { duration:3000 })  
+
+        }
+ 
+      }).catch((error) => {
+        setLoading(false)
+        console.log(error)
+        toast.error(<ToastContent message={error.message} />, { duration:3000 })  
+
+      })
+    
     } else {
       for (const key in data) {
         if (data[key].length === 0) {
@@ -101,10 +111,14 @@ const ResetPasswordBasic = () => {
                   id='password'
                   name='password'
                   control={control}
+                  rules={{
+                    required: 'This field is required'
+                  }}
                   render={({ field }) => (
                     <InputPasswordToggle className='input-group-merge' invalid={errors.password && true} {...field} />
                   )}
                 />
+                {errors.password && <p className='text-danger'>{errors.password.message}</p>}
               </div>
               <div className='mb-1'>
                 <Label className='form-label' for='confirmPassword'>
@@ -114,17 +128,22 @@ const ResetPasswordBasic = () => {
                   id='confirmPassword'
                   name='confirmPassword'
                   control={control}
+                  rules={{
+                    required: 'This field is required',
+                    validate: (value) => value === getValues('password') || 'Passwords do not match'
+                  }}
                   render={({ field }) => (
                     <InputPasswordToggle className='input-group-merge' invalid={errors.confirmPassword && true} {...field} />
                   )}
                 />
+                 {errors.confirmPassword && <p className='text-danger'>{errors.confirmPassword.message}</p>}
               </div>
-              <Button color='primary' block>
-                Set New Password
+              <Button color='primary' block disabled={loading}>
+              {loading && <Spinner size="sm" className='me-50'/>} Set New Password
               </Button>
             </Form>
             <p className='text-center mt-2'>
-              <Link to='/pages/login-basic'>
+              <Link to='/login'>
                 <ChevronLeft className='rotate-rtl me-25' size={14} />
                 <span className='align-middle'>Back to login</span>
               </Link>

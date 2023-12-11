@@ -1,4 +1,4 @@
-import { Mail, Home, Sliders, Briefcase, Search, List, UserCheck, Gift, Bell, ShoppingBag, AlignJustify, AlignLeft, Settings} from "react-feather"
+import { Mail, Home, Sliders, Briefcase, Search, List, UserCheck, Gift, Bell, ShoppingBag, AlignJustify, AlignLeft, Settings, Users} from "react-feather"
 
 export default [
   {
@@ -13,6 +13,12 @@ export default [
     title: "Settings",
     icon: <Sliders size={20}/>,
     navLink: "/settings"
+  },
+  {
+    id: "Users",
+    title: "Users",
+    icon: <Users size={20}/>,
+    navLink: "/users"
   }
   
 ]

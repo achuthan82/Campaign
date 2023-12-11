@@ -72,12 +72,8 @@ export const getToken = () => localStorage.getItem("accessToken")
   if (userRole === 3) return "Marketplace Member"
   return "/login"
 }
-export const getHomeRouteForLoggedInUser = (userRole) => {
-  
-  if (userRole === 1) return DefaultRoute
-  if (userRole === 2) return DefaultRoute
-  if (userRole === 3) return DefaultRoute
-  return "/login"
+export const getHomeRouteForLoggedInUser = () => {
+  return DefaultRoute
 }
 
 // ** React Select Theme Colors

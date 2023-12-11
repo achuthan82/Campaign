@@ -14,6 +14,7 @@ import PublicRoute from "@components/routes/PublicRoute"
 import { isObjEmpty } from "@utils"
 import Dashboard from "../../views/Dashboard"
 import Settings from "../../views/Settings"
+import User from "../../views/users/User"
 // import OrderSummary from "../../views/OrderSummary"
 // import OrderStates from "../../views/OrderStates"
 // import StateDetails from "../../views/StateDetails"
@@ -64,7 +65,7 @@ const Routes = [
     }
   },
   {
-    path: "/register",
+    path: "/register/:token",
     element: <Register />,
     meta: {
       layout: "blank"
@@ -85,7 +86,7 @@ const Routes = [
     }
   },
   {
-    path: "/reset-password",
+    path: "/reset-password/:token",
     element: <ResetPassword />,
     meta: {
       layout: "blank"
@@ -105,6 +106,10 @@ const Routes = [
   {
     path:'/settings',
     element:<Settings/>
+  },
+  {
+    path:'/users',
+    element:<User/>
   }
 
 

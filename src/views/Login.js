@@ -1,6 +1,6 @@
 // ** React Imports
-import { useContext, useState, useEffect } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import {useState} from 'react'
+import { Link, useNavigate} from 'react-router-dom'
 
 // ** Icons Imports
 import { Coffee, X } from 'react-feather'
@@ -10,9 +10,6 @@ import { Coffee, X } from 'react-feather'
 
 // ** Custom Components
 import InputPasswordToggle from '@components/input-password-toggle'
-
-// ** Context
-import { AbilityContext } from '@src/utility/context/Can'
 
 // ** Reactstrap Imports
 import { Card, CardBody, CardTitle, CardText, Form, Label, Input, Button, Spinner, Modal, ModalBody, ModalHeader, Row, Col } from 'reactstrap'
@@ -27,7 +24,6 @@ import { handleLogin } from '@store/authentication'
 
 import axios from 'axios'
 // ** Utils
-import { getHomeRouteForLoggedInUser } from '@utils'
 
 import ComponentSpinner from '@components/spinner/Loading-spinner'
 
@@ -38,7 +34,7 @@ import Avatar from '@components/avatar'
 // ** Styles
 import '@styles/react/pages/page-authentication.scss'
 
-const ToastContent = ({ t, name, role }) => {
+const ToastContent = ({ t, name}) => {
   return (
     <div className='d-flex'>
       <div className='me-1'>
@@ -49,62 +45,31 @@ const ToastContent = ({ t, name, role }) => {
           <h6>{name}</h6>
           <X size={12} className='cursor-pointer' onClick={() => toast.dismiss(t.id)} />
         </div>
-        <span>You have successfully logged in as an {role} user to the MARKETPLACE. Now you can start to explore. Enjoy!</span>
+        <span>You have successfully logged in to  the CAMPAIGN APP. Now you can start to explore. Enjoy!</span>
       </div>
     </div>
   )
 }
 
-const ToastContentAllowAccess = ({ message = null }) => (
-  <>
-  {message !== null && (
-  <div className='d-flex'>
-      <div className='me-1'>
-          {/* <Avatar size='sm' color='error'/> */}
-      </div>
-      <div className='d-flex flex-column'>
-          <div className='d-flex justify-content-between'>
-              <span>{message}</span>
-          </div>
-      </div>
-  </div>
-  )}
-  </>
-)
-
-
 const Login = () => {
   // ** Hooks
-  // localStorage.removeItem('cartData')
-  // const { skin } = useSkin()
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const ability = useContext(AbilityContext)
-  const {token} = useParams()
+  console.log(navigate)
   // ** State
   const [showError, setShowError] = useState('')
-  const [show, setShow] = useState(false)
-  const [loading, setLoading] = useState(false)
   const [loginLoading, setLoginLoading] = useState(false)
-  const moveToDashboard = () => {
-    navigate('/dashboard')
-  }
-  const ability_ = [
-    {
-      action: 'manage',
-      subject: 'all'
-    }
-  ]
+ 
   const defaultValues = {
     password: '',
     loginEmail: '',
     name: '',
-    email: '',
-    address: '',
-    phone: '',
-    hierarchy: '',
-    hierarchyEmail: '',
-    hierarchyPhone: ''
+    email: ''
+    // address: '',
+    // phone: '',
+    // hierarchy: '',
+    // hierarchyEmail: '',
+    // hierarchyPhone: ''
   }
   
   const {
@@ -113,21 +78,16 @@ const Login = () => {
     handleSubmit,
     formState: { errors }
   } = useForm({ defaultValues })
-  // const illustration = skin === 'dark' ? 'login-v2-dark.svg' : 'login-v2.svg'
-    // source = require(`@src/assets/images/pages/${illustration}`).default
 
   const onSubmit = data => {
     setShowError('')
     console.log(data.loginEmail)
     if (data.loginEmail.length > 0 && data.password.length > 0) {
       setLoginLoading(true)
-    // if (Object.values(data).every(field => field.length > 0)) {
       const config = {
         method: 'post',
         url: `${apiConfig.api.url}auth/login`,
-        // headers: { 
-        //   Authorization: `Token ${getToken()}`
-        // }
+       
         data: { email: data.loginEmail, password: data.password }
       }
 
@@ -135,17 +95,14 @@ const Login = () => {
       .then(function (res) {
         if (res.data.status === 200) {
           if (res.data.auth_token) {
-            
             const dt = res.data.data
-            dt.ability = ability_
             const data = { dt, accessToken: res.data.auth_token, refreshToken: res.data.auth_token }
-           
-            // const data = { ...res.data.data, accessToken: res.data.auth_token, refreshToken: res.data.refreshToken }
+            console.log('data', data)
+            // setLoading(false)
             dispatch(handleLogin(data))
-            ability.update(ability_)
-            navigate(getHomeRouteForLoggedInUser(res.data.data.role_id))
+            navigate('/dashboard')
             toast(t => (
-              <ToastContent t={t} role={(data.dt.role_id === 1 && 'Admin') || (data.dt.role_id === 2 && 'Agent') || (data.dt.role_id === 3 && 'Marketplace Member')} name={data.dt.name || data.dt.email || 'Unknown'} />
+              <ToastContent t={t}  name={data.dt.first_name || data.dt.email || 'Unknown'} />
             ))
           } else setShowError(res.data.message)
         } else setShowError(res.data.message)
@@ -159,20 +116,6 @@ const Login = () => {
           setShowError(error.message)
         } setLoginLoading(false)
       })
-      // https://iver-survey-system.herokuapp.com/v1
-      // useJwt
-      //   .login({ email: data.loginEmail, password: data.password })
-      //   .then(res => {
-      //     const data = { ...res.data.userData, accessToken: res.data.accessToken, refreshToken: res.data.refreshToken }
-      //     dispatch(handleLogin(data))
-      //     ability.update(res.data.userData.ability)
-      //     navigate(getHomeRouteForLoggedInUser(data.role))
-      //     toast.success(
-      //       <ToastContent name={data.fullName || data.username || 'John Doe'} role={data.role || 'admin'} />,
-      //       { icon: false, transition: Slide, hideProgressBar: true, autoClose: 2000 }
-      //     )
-      //   })
-      //   .catch(err => console.log(err))
     } else {
       for (const key in data) {
         if (data[key].length === 0) {
@@ -251,48 +194,7 @@ const Login = () => {
   //     }
   //   }
   // }
-
-  const redirectLogin = token => {
-    setShowError('')
-    console.log(token)
-    const config = {
-      method: 'post',
-      url: `${apiConfig.api.url}auth/login`,
-      data: { auth_token: token }
-    }
-    axios(config)
-    .then(function (res) {
-      if (res.data.status === 200) {
-        if (res.data.auth_token) {
-          const dt = res.data.data
-          dt.ability = ability_
-          const data = { dt, accessToken: res.data.auth_token, refreshToken: res.data.auth_token }
-          dispatch(handleLogin(data))
-          ability.update(ability_)
-          navigate(getHomeRouteForLoggedInUser(res.data.data.role_id))
-          toast(t => (
-            <ToastContent t={t} role={(data.dt.role_id === 1 && 'Admin') || (data.dt.role_id === 2 && 'Agent') || (data.dt.role_id === 3 && 'Marketplace Member')} name={data.dt.name || data.dt.email || 'Unknown'} />
-          ))
-        } else setShowError(res.data.message)
-      } else setShowError(res.data.message)
-      setLoading(false)
-    })
-    .catch(function (error) {
-      console.log(error)
-      if (error && error.response) {
-        setShowError(error.response.data)
-      } else if (error && error.message) {
-        setShowError(error.message)
-      } setLoading(false)
-    })
-  }
-  
-  useEffect(() => {
-    if (token) {
-      setLoading(true)
-      redirectLogin(token)
-    }
-  }, [token])
+ 
  
   return (
     <>
@@ -328,6 +230,7 @@ const Login = () => {
                     />
                   )}
                 />
+                {errors.loginEmail && <span className='text-danger'>This field is required</span>}
               </div>
               <div className='mb-1'>
                 <div className='d-flex justify-content-between'>
@@ -346,6 +249,8 @@ const Login = () => {
                     <InputPasswordToggle className='input-group-merge' invalid={errors.password && true} {...field} />
                   )}
                 />
+                {errors.password && <span className='text-danger'>This field is required</span>}
+
               </div>
               <div className='form-check mb-1'>
                 <Input type='checkbox' id='remember-me' />
@@ -353,175 +258,17 @@ const Login = () => {
                   Remember Me
                 </Label>
               </div>
-              <Button type='submit' disabled={loginLoading} color='primary' block onClick={moveToDashboard} >
+              <Button type='submit' disabled={loginLoading} color='primary' className='' block>
                 {loginLoading && <Spinner size="sm" className='me-50' />} Login
               </Button>
-              {/* <Button disabled={loginLoading} className='mt-50' type='button' color='primary' block onClick={() => {
-                    setShow(true)
-                  }}>
-                Request an account
-              </Button> */}
+           
             </Form>
           </CardBody>
         </Card>
       </div>
     </div>
 
-    <Modal isOpen={show} toggle={() => setShow(!show)} className='modal-dialog-centered modal-lg'>
-    <ModalHeader className='bg-transparent' toggle={() => setShow(!show)}></ModalHeader>
-    <ModalBody className='px-sm-5 pt-50 pb-5'>
-      <div className='text-center mb-2'>
-        <h1 className='mb-1'>Request Account</h1>
-      </div>
-      {/* <Form onSubmit={handleSubmit(onSubmitRegister)}> */}
-        <Row className='gy-1 pt-75'>
-          <Col md={12} xs={12}>
-            <Label for='name'>Full Name</Label>
-            <Controller
-                id='name'
-                name='name'
-                control={control}
-                render={({ field }) => (
-                <Input
-                autoFocus
-                type='text'
-                invalid={errors.name && true}
-                {...field}
-                />
-                )}
-              />
-          </Col>
-          <Col md={12} xs={12}>
-            <Label for='address'>Address</Label>
-            <Controller
-                id='address'
-                name='address'
-                control={control}
-                render={({ field }) => (
-                <Input
-                autoFocus
-                type='text'
-                invalid={errors.address && true}
-                {...field}
-                />
-                )}
-              />
-          </Col>
-          <Col md={12} xs={12}>
-            <Label for='address'>Phone</Label>
-            <Controller
-                id='phone'
-                name='phone'
-                control={control}
-                render={({ field }) => (
-                <Input
-                autoFocus
-                type='text'
-                invalid={errors.phone && true}
-                {...field}
-                />
-                )}
-              />
-          </Col>
-          <Col md={12} xs={12}>
-            <Label className='form-label' for='email'>
-                  Email
-                </Label>
-                <Controller
-                  id='email'
-                  name='email'
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      type='email'
-                      placeholder='john@example.com'
-                      invalid={errors.email && true}
-                      {...field}
-                    />
-                  )}
-                />
-          </Col>
-          <Col md={12} xs={12}>
-          <div>
-              <Label for='cost'>Hierarchy</Label>
-              <Controller
-                id='hierarchy'
-                name='hierarchy'
-                control={control}
-                render={({ field }) => (
-                <Input
-                autoFocus
-                type='text'
-                invalid={errors.hierarchy && true}
-                {...field}
-                />
-                )}
-              />
-              
-            </div>
-          </Col>
-          <Col md={12} xs={12}>
-          <div>
-              <Label for='cost'>Hierarchy Phone</Label>
-              <Controller
-                id='hierarchyPhone'
-                name='hierarchyPhone'
-                control={control}
-                render={({ field }) => (
-                <Input
-                type='text'
-                invalid={errors.hierarchyPhone && true}
-                {...field}
-                />
-                )}
-              />
-              
-            </div>
-          </Col>
-          <Col md={12} xs={12}>
-          <div>
-              <Label for='cost'>Hierarchy Email</Label>
-              <Controller
-                  id='hierarchyEmail'
-                  name='hierarchyEmail'
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      type='email'
-                      placeholder='john@example.com'
-                      invalid={errors.hierarchyEmail && true}
-                      {...field}
-                    />
-                  )}
-                />
-              
-            </div>
-          </Col>
-        </Row>
-        
-        <Col xs={12} className='text-center mt-2 pt-50'>
-          
-            <Button type='submit' disabled={loginLoading} className='me-1' color='primary' style={{marginRight: '20px'}}>
-            {loginLoading && <Spinner size="sm" className='me-50' />} Send now to request access
-            </Button>
-            <Button
-              type='reset'
-              color='secondary'
-              outline
-              disabled={loginLoading}
-              onClick={() => {
-                // handleReset()
-                setShow(false)
-              }}
-            >
-              Cancel
-            </Button>
-          </Col>
-      {/* </Form> */}
-      
-    </ModalBody>
-    </Modal>
-    {loading && <ComponentSpinner txt="Redirecting" />}
+    {/* {loading && <ComponentSpinner txt="Redirecting" />} */}
     </>
   )
 }

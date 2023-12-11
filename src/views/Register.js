@@ -1,6 +1,6 @@
 // ** React Imports
-import { Link } from 'react-router-dom'
-
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useState } from 'react'
 // ** Icons Imports
 import { Facebook, Twitter, Mail, GitHub, Coffee, X } from 'react-feather'
 import apiConfig from '@configs/apiConfig'
@@ -8,7 +8,7 @@ import apiConfig from '@configs/apiConfig'
 import InputPasswordToggle from '@components/input-password-toggle'
 
 // ** Reactstrap Imports
-import { Card, CardBody, CardTitle, CardText, Form, Label, Input, Button } from 'reactstrap'
+import { Card, CardBody, CardTitle, CardText, Form, Label, Input, Button, Spinner } from 'reactstrap'
 import { useForm, Controller } from 'react-hook-form'
 import axios from 'axios'
 import { toast } from 'react-hot-toast'
@@ -19,72 +19,65 @@ import '@styles/react/pages/page-authentication.scss'
 
 // import logo from '@src/assets/images/logo/logo.png'
 
-const ToastContent = ({ t, message }) => {
-  return (
-    <div className='d-flex'>
-      <div className='me-1'>
-        <Avatar size='sm' color='success' icon={<Coffee size={12} />} />
-      </div>
-      <div className='d-flex flex-column'>
-        <div className='d-flex justify-content-between'>
-          <h6>{message}</h6>
-          <X size={12} className='cursor-pointer' onClick={() => toast.dismiss(t.id)} />
+const ToastContent = ({ message = null }) => (
+  <>
+    {message !== null && (
+      <div className="d-flex">
+        <div className="me-1">{/* <Avatar size='sm' color='error'/> */}</div>
+        <div className="d-flex flex-column">
+          <div className="d-flex justify-content-between">
+            <span>{message}</span>
+          </div>
         </div>
-        {/* <span>You have successfully logged in as an {role} user to AIM. Now you can start to explore. Enjoy!</span> */}
       </div>
-    </div>
-  )
-}
+    )}
+  </>
+)
 
 const RegisterBasic = () => {
+  const navigate = useNavigate()
   const {
     control,
     setError,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
+    getValues
   } = useForm({ })
-
+  const [loading, setLoading] = useState(false)
+  const data = useParams()
+  const token = data.token
   const onSubmit = data => {
     if (Object.values(data).every(field => field.length > 0)) {
+      setLoading(true)
       const config = {
-        method: 'post',
-        url: `${apiConfig.api.url}user/signup`,
-        
-        data: { name: data.name, email: data.email, password: data.password }
+        method: 'put',
+        url: `${apiConfig.api.url}user/register_from_invitation`,
+        headers: { 
+          Authorization: `Token ${token}`
+        },
+        data: { password: data.password, confirm_password: data.confirmPassword }
       }
-
+      
       axios(config)
-      .then(function (res) {
-        console.log(res)
-        const dt = res.data
-        // dt.ability = ability_
-        // const data = { dt, accessToken: res.data.auth_token, refreshToken: res.data.auth_token }
-        // // const data = { ...res.data.data, accessToken: res.data.auth_token, refreshToken: res.data.refreshToken }
-        // dispatch(handleLogin(data))
-        // ability.update(ability_)
-        // let role = ''
-        // if (res.data.data.role_id === 1) role = 'Admin'
-        // if (res.data.data.role_id === 2) role = 'Agent'
-        // if (res.data.data.role_id === 3) role = 'Marketplace Member'
-        // navigate(getHomeRouteForLoggedInUser(role))
-        toast(t => (
-          <ToastContent t={t}  message={dt.message || 'Unknown'} />
-        ))
-      }).catch(err => console.log(err))
-      // https://iver-survey-system.herokuapp.com/v1
-      // useJwt
-      //   .login({ email: data.loginEmail, password: data.password })
-      //   .then(res => {
-      //     const data = { ...res.data.userData, accessToken: res.data.accessToken, refreshToken: res.data.refreshToken }
-      //     dispatch(handleLogin(data))
-      //     ability.update(res.data.userData.ability)
-      //     navigate(getHomeRouteForLoggedInUser(data.role))
-      //     toast.success(
-      //       <ToastContent name={data.fullName || data.username || 'John Doe'} role={data.role || 'admin'} />,
-      //       { icon: false, transition: Slide, hideProgressBar: true, autoClose: 2000 }
-      //     )
-      //   })
-      //   .catch(err => console.log(err))
+      .then(function (response) {
+        setLoading(false)
+
+        console.log(response)
+        if (response.data.status === 200) {
+          toast.success(<ToastContent message={response.data.message} />, { duration:3000 })  
+          navigate('/login')
+        } else {
+          toast.error(<ToastContent message={response.data.message} />, { duration:3000 })  
+
+        }
+       
+      }).catch(() => {
+        setLoading(false)
+
+        toast.error(<ToastContent message='Network Error' />, { duration:3000 })  
+
+      })
+      
     } else {
       for (const key in data) {
         if (data[key].length === 0) {
@@ -108,59 +101,43 @@ const RegisterBasic = () => {
             </Link>
             <h3>Sign Up</h3>
             <Form className='auth-register-form mt-2' onSubmit={handleSubmit(onSubmit)}>
-              <div className='mb-1'>
-                <Label className='form-label' for='name'>
-                  Name
-                </Label>
-                <Controller
-                  id='name'
-                  name='name'
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      autoFocus
-                      type='text'
-                      placeholder='johndoe'
-                      invalid={errors.name && true}
-                      {...field}
-                    />
-                  )}
-                />
-              </div>
-              <div className='mb-1'>
-                <Label className='form-label' for='email'>
-                  Email
-                </Label>
-                <Controller
-                  id='email'
-                  name='email'
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      type='email'
-                      placeholder='john@example.com'
-                      invalid={errors.email && true}
-                      {...field}
-                    />
-                  )}
-                />
-              </div>
-              <div className='mb-1'>
-                <Label className='form-label' for='password'>
-                  Password
+            
+            <div className='mb-1'>
+                <Label className='form-label' for='new-password'>
+                  New Password
                 </Label>
                 <Controller
                   id='password'
                   name='password'
                   control={control}
+                  rules={{
+                    required: 'This field is required'
+                  }}
                   render={({ field }) => (
-                    <InputPasswordToggle className='input-group-merge' id='password' 
-                      invalid={errors.password && true}
-                      {...field} />
+                    <InputPasswordToggle className='input-group-merge' invalid={errors.password && true} {...field} />
                   )}
                 />
+                {errors.password && <p className='text-danger'>{errors.password.message}</p>}
               </div>
-              <div className='form-check mb-1'>
+              <div className='mb-1'>
+                <Label className='form-label' for='confirmPassword'>
+                  Confirm Password
+                </Label>
+                <Controller
+                  id='confirmPassword'
+                  name='confirmPassword'
+                  control={control}
+                  rules={{
+                    required: 'This field is required',
+                    validate: (value) => value === getValues('password') || 'Passwords do not match'
+                  }}
+                  render={({ field }) => (
+                    <InputPasswordToggle className='input-group-merge' invalid={errors.confirmPassword && true} {...field} />
+                  )}
+                />
+                 {errors.confirmPassword && <p className='text-danger'>{errors.confirmPassword.message}</p>}
+              </div>
+              {/* <div className='form-check mb-1'>
                 <Input type='checkbox' id='terms' />
                 <Label className='form-check-label' for='terms'>
                   I agree to
@@ -168,9 +145,9 @@ const RegisterBasic = () => {
                     privacy policy & terms
                   </a>
                 </Label>
-              </div>
-              <Button color='primary' block>
-                Sign up
+              </div> */}
+              <Button color='primary' block disabled={loading}>
+              {loading && <Spinner size="sm" className='me-50'/>}  Sign up
               </Button>
             </Form>
             <p className='text-center mt-2'>
