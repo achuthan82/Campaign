@@ -1,22 +1,56 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import { Copy, Delete, Edit, MoreVertical, ChevronDown, Plus, Trash } from 'react-feather'
 import { CardTitle, Card, CardBody, Badge, Label, Input, Row, Col, CardHeader, UncontrolledDropdown, DropdownItem, DropdownToggle, DropdownMenu, Button } from 'reactstrap'
 import DataTable from 'react-data-table-component'
 import KeyEditModal from './KeyEditModal'
 import AddSite from './AddSite'
+import apiConfig from '../configs/apiConfig'
+import axios from 'axios'
+import { getToken } from '@utils'
+import { toast } from 'react-hot-toast'
+import moment from "moment"
+import ComponentSpinner from '@components/spinner/Loading-spinner'
+
+const ToastContent = ({ message = null }) => (
+  <>
+    {message !== null && (
+      <div className="d-flex">
+        <div className="me-1">{/* <Avatar size='sm' color='error'/> */}</div>
+        <div className="d-flex flex-column">
+          <div className="d-flex justify-content-between">
+            <span>{message}</span>
+          </div>
+        </div>
+      </div>
+    )}
+  </>
+)
 const Settings = () => {
+    const token = getToken()
     const [keyModal, setKeyModal] = useState(false)
     const [siteModal, setSiteModal] = useState(false)
+    const [siteData, setSiteData] = useState([])
+    const [pending, setPending] = useState(false)
+    const [aiDetails, setAiDetails] = useState(null)
+    const [loading, setLoading] = useState(false)
     const columns = [
         {
             name: 'Name',
-            selector: 'name',
+            selector: 'site_name',
             sortable: true
         },
         {
             name: 'URL',
-            selector: 'url',
-            sortable: true
+            selector: 'site_url',
+            sortable: true,
+            cell: row => {
+              console.log('row', row)
+              return (
+                  <span>
+                    <a href={row.site_url} target="_blank">{row.site_url}</a>
+                  </span>
+              )
+          }
         },
         {
             name: 'Status',
@@ -26,7 +60,7 @@ const Settings = () => {
                 console.log('row', row)
                 return (
                     <span>
-                     <Badge color='light-success'>Active</Badge>
+                     <Badge color={row.site_status === 'Active' ? 'light-success' : 'light-warning'}>{row.site_status}</Badge>
                     </span>
                 )
             }
@@ -58,24 +92,76 @@ const Settings = () => {
           }
 
     ]
-    const data = [
-        {
-          name:'Test 1',
-          url:'sfhsdjssdf',
-          status:'Active'
+    // const data = [
+    //     {
+    //       name:'Test 1',
+    //       url:'sfhsdjssdf',
+    //       status:'Active'
 
-        },
-        {
-            name:'Test 2',
-            url:'sfhsdjssdf',
-            status:'Active'
+    //     },
+    //     {
+    //         name:'Test 2',
+    //         url:'sfhsdjssdf',
+    //         status:'Active'
   
-          }
-    ]
+    //       }
+    // ]
+    const getSiteDetails = () => {
+      setPending(true)
+      const config = {
+        method: 'get',
+        url: `${apiConfig.api.url}site_settings`,
+        headers: { 
+          Authorization: `Token ${token}`
+        }
+      }
+      axios(config).then((response) => {
+        console.log('response', response)
+        setPending(false)
+        if (response.data.status === 200) {
+           setSiteData(response.data.data)
+        } else if (response.data.status === 204) {
+          setSiteData([])
+        } else {
+          toast.error(<ToastContent message={response.data.message} />, { duration:3000 })  
+        }
+      }).catch((error) => {
+        setPending(false)
+        toast.error(<ToastContent message={error.message} />, { duration:3000 })  
+      })
+    }
+    const getOpenApi = () => {
+      setLoading(true)
+      const config = {
+        method: 'get',
+        url: `${apiConfig.api.url}openai_api_key`,
+        headers: { 
+          Authorization: `Token ${token}`
+        }
+      }
+      axios(config).then((response) => {
+        setLoading(false)
+        console.log('response', response)
+        if (response.data.status === 200) {
+          setAiDetails(response.data.data.openai_api_key1)
+        } else if (response.data.status === 204) {
+          setAiDetails(null)
+        } else {
+          toast.error(<ToastContent message={response.data.message} />, { duration:3000 })  
+        }
+      }).catch((error) => {
+        setLoading(false)
+        toast.error(<ToastContent message={error.message} />, { duration:3000 })  
+      })
+    }
+    useEffect(() => {
+      getSiteDetails()
+      getOpenApi()
+    }, [])
   return (
     <div>
       <h2 className='card-text-log mb-1'>Open AI and Site Settings</h2>
-      <Card className='p-1 mb-1'>
+      <Card className='mb-1'>
         <CardBody>
            <div className='mb-1'>
            <h4 className='mb-1'>Open AI API Key List</h4>
@@ -84,20 +170,23 @@ const Settings = () => {
             <div>
                 <Card className='nested-card p-1 mb-0'>
                     <CardBody>
+                    { aiDetails !== null ? <div>
                   <div className='d-flex justify-content-between align-items-center mb-1'>
                   <div className='d-flex vertical-align-middle'>
-                  <h3 className='me-1'>Key 1</h3>
+                  <h3 className='me-1'>{ aiDetails.name }</h3>
                   <span><Badge color='light-primary'>Active</Badge></span>
                   </div>
-                  <span><MoreVertical size={15}></MoreVertical></span>
+                  <span style={{cursor:'pointer'}} onClick={() => setKeyModal(true)}><MoreVertical size={15}></MoreVertical></span>
                   </div>
                   <div className='mb-1'>
-                    <span className='me-1'>23eaf7f0-f4f7-495e-8b86-fad3261282ac</span>
+                    <span className='me-1'>{aiDetails.openai_api_key}</span>
                     <span><Copy size={15}/></span>
                   </div>
                   <div>
-                    <small>Added on 28 Apr 2021, 10:00</small>
+                    <small>{aiDetails.created_at === aiDetails.updated_at ? 'Added on' : 'Updated on'} {aiDetails.created_at === aiDetails.updated_at ? moment(aiDetails.created_at, "ddd, DD MMM YYYY HH:mm:ss [GMT]").format('DD-MM-YYYY hh:mm A') : moment(aiDetails.updated_at, "ddd, DD MMM YYYY HH:mm:ss [GMT]").format('DD-MM-YYYY hh:mm A')  }</small>
                   </div>
+                  </div> : <div><div className='d-flex justify-content-end'><span style={{cursor:'pointer'}} onClick={() => setKeyModal(true)}><Plus size={15}></Plus></span></div><div className='text-center'>No AI Key to show</div></div>
+                 }
                   </CardBody>
                 </Card>
             </div>
@@ -145,12 +234,15 @@ const Settings = () => {
             className='react-dataTable'
             columns={columns}
             sortIcon={<ChevronDown size={10} />}
-            data={data}
+            data={siteData}
+            progressPending={pending}
           />
         </div>
       </Card>
-    <KeyEditModal keyModal={keyModal} setKeyModal={setKeyModal}/>
-    <AddSite siteModal={siteModal} setSiteModal={setSiteModal}/>
+      {loading && <ComponentSpinner txt="Loading.."/>}
+
+    <KeyEditModal keyModal={keyModal} setKeyModal={setKeyModal} aiDetails={aiDetails} getOpenApi={getOpenApi}/>
+    <AddSite siteModal={siteModal} setSiteModal={setSiteModal} getSiteDetails={getSiteDetails}/>
     </div>
   )
 }
