@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from "react"
-import { MoreHorizontal, MoreVertical, ArrowRightCircle, Plus, Edit2 } from "react-feather"
-import { Row, Col, Input, Button, Card, CardBody, Badge, UncontrolledDropdown, DropdownItem, DropdownMenu, DropdownToggle } from "reactstrap"
+import { MoreHorizontal, MoreVertical, ArrowRightCircle, Plus, Edit2, Grid, List } from "react-feather"
+import { Row, Col, Input, Button, Card, CardBody, Badge, UncontrolledDropdown, DropdownItem, DropdownMenu, DropdownToggle, ButtonGroup } from "reactstrap"
 import AddCampaign from "./AddCampaign"
 import apiConfig from '@configs/apiConfig'
 import axios from "axios"
@@ -8,6 +8,8 @@ import { getToken } from '@utils'
 import { toast } from 'react-hot-toast'
 import ComponentSpinner from '@components/spinner/Loading-spinner'
 import moment from "moment"
+import classnames from "classnames"
+
 const ToastContent = ({ message = null }) => (
     <>
       {message !== null && (
@@ -29,6 +31,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(false)
   const [campaignList, setCampaignList] = useState([])
   const [editData, setEditData] = useState(null)
+  const [view, setView] = useState("list")
   const getCampaign = () => {
     setLoading(true)
     const config = {
@@ -58,10 +61,12 @@ const Dashboard = () => {
      setEditData(item)
      setModalOpen(true)
   }
+  
   useEffect(() => {
     getCampaign()
     // getCategory()
   }, [])
+
   const campaignColor = { backgroundColor:'rgba(70, 46, 149, 0.03)' }
   return (
     <div>
@@ -75,7 +80,32 @@ const Dashboard = () => {
              <Input type="text" placeholder="search"></Input>
              </span>
            
-              <Button color="primary" onClick={() => { setModalOpen(true); setEditData(null) }}><span className="me-50"><Plus size={15}></Plus></span>Add New</Button>
+              <Button color="primary" className="me-1" onClick={() => { setModalOpen(true); setEditData(null) }}><span className="me-50"><Plus size={15}></Plus></span>Add New</Button>
+              <ButtonGroup>
+              <Button
+              tag="label"
+              className={classnames("btn-icon view-btn list-view-btn", {
+                active: view === "list"
+              })}
+              color="primary"
+              outline
+              onClick={() => setView("list")}
+            >
+              <List size={18} />
+            </Button>
+            <Button
+              tag="label"
+              className={classnames("btn-icon view-btn grid-view-btn", {
+                active: view === "grid"
+              })}
+              color="primary"
+              outline
+              onClick={() => setView("grid")}
+            >
+              <Grid size={18} />
+            </Button>
+           
+          </ButtonGroup>
            
         </Col>
       </Row>
@@ -84,10 +114,10 @@ const Dashboard = () => {
           campaignList && campaignList.length > 0 && 
           campaignList.map((item, index) => {
             return (
-              <Col md={6} lg={4} key={item.id}>
+              <Col md={6} lg={view === 'list' ? 12 : 4} key={item.id}>
             <Card className="campaign-card" style={ index % 2 !== 0 ? campaignColor : null}>
               <CardBody>
-                <Row className="align-items-top mb-1">
+                <Row className={`align-items-top ${view !== 'list' ? 'mb-1' : ''}`}>
                   <Col xs={10}>
                     <h5>{item.post_title}</h5>
                     <p>{moment(item.created_at, "ddd, DD MMM YYYY HH:mm:ss [GMT]").format('DD-MM-YYYY hh:mm A')}</p>
@@ -103,9 +133,9 @@ const Dashboard = () => {
                   </UncontrolledDropdown>
                   </Col>
                 </Row>
-                <Row className="mb-1">
+                <Row className={`${view !== 'list' ? 'mb-1' : ''}`}>
                   <Col>
-                    <p>
+                    <p className="truncated-paragraph">
                      {item.post_content}
                     </p>
                   </Col>

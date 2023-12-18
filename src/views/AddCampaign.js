@@ -46,9 +46,11 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
     const [categoryModal, setCategoryModal] = useState(false)
     const [categoryOptions, setCategoryOptions] = useState([])
     const [loading, setLoading] = useState(false)
+    const [uploadedImage, setUploadedImage] = useState('')
     const { getRootProps, getInputProps } = useDropzone({
       onDrop: acceptedFiles => {
         console.log(acceptedFiles[0])
+        setUploadedImage('')
         setFiles([Object.assign(acceptedFiles[0])])
         // setFiles([...files, ...acceptedFiles.map(file => Object.assign(file))])
       }
@@ -228,8 +230,10 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
       lastModified: fileDetails.lastModified,
       type: fileDetails.type
     })
-
+    console.log('uploaded image', editData.url)
     setFiles([customFile])
+    setUploadedImage(editData.url)
+
       }
     }
     }, [modalOpen])
@@ -261,6 +265,7 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
       setValue('interval', null)
       setValue('site', null)
       setValue('category', null)
+      setEditData(null)
       setFiles([])
     }
   return (
@@ -475,7 +480,7 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
         </div>
                 </Col>
             </Row>
-            {files.length ? (
+            {files.length && uploadedImage === '' ? (
           <Fragment>
             <ListGroup className='my-2'>{fileList}</ListGroup>
             {/* <div className='d-flex justify-content-end'>
@@ -485,6 +490,12 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
             </div> */}
           </Fragment>
         ) : null}
+        { uploadedImage !== '' && <Row className='mt-1'>
+          <Col>
+          <h6>Uploaded Image</h6>
+          <img src={uploadedImage} alt="uploaded image" style={{width:'200px'}}></img>
+          </Col></Row>
+        }
         </ModalBody>
         <ModalFooter className='d-flex justify-content-center'>
             <Button color='primary' type="submit" disabled={loading}>{loading && <Spinner size="sm" className='me-50' />} Submit</Button>

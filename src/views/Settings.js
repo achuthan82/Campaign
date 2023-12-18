@@ -10,6 +10,7 @@ import { getToken } from '@utils'
 import { toast } from 'react-hot-toast'
 import moment from "moment"
 import ComponentSpinner from '@components/spinner/Loading-spinner'
+import { TRUE } from 'sass'
 
 const ToastContent = ({ message = null }) => (
   <>
@@ -33,6 +34,11 @@ const Settings = () => {
     const [pending, setPending] = useState(false)
     const [aiDetails, setAiDetails] = useState(null)
     const [loading, setLoading] = useState(false)
+    const [editData, setEditData] = useState(null)
+    const editOpen = (row) => {
+       setEditData(row)
+       setSiteModal(true)
+    }
     const columns = [
         {
             name: 'Name',
@@ -74,7 +80,7 @@ const Settings = () => {
              console.log(row)
               return (
                 <div className='d-flex align-items-center'>
-                <span className='me-1' onClick={() => setKeyModal(!keyModal)}><Edit size={15}/></span>
+                <span className='me-1'  onClick={() => editOpen(row)}><Edit size={15}/></span>
                 <span className='me-1'><Trash size={15}/></span>
 
                 <UncontrolledDropdown >
@@ -154,6 +160,10 @@ const Settings = () => {
         toast.error(<ToastContent message={error.message} />, { duration:3000 })  
       })
     }
+    const addOpen = () => {
+      setEditData(null)
+      setSiteModal(true)
+    }
     useEffect(() => {
       getSiteDetails()
       getOpenApi()
@@ -224,7 +234,7 @@ const Settings = () => {
               id='search-input'
             />
             </div>
-            <Button color="primary" onClick={() => setSiteModal(!siteModal)}><span className='me-50'><Plus size={15}/></span><span>Add New </span></Button>
+            <Button color="primary" onClick={addOpen}><span className='me-50'><Plus size={15}/></span><span>Add New </span></Button>
             </div>
             </div>
          
@@ -242,7 +252,7 @@ const Settings = () => {
       {loading && <ComponentSpinner txt="Loading.."/>}
 
     <KeyEditModal keyModal={keyModal} setKeyModal={setKeyModal} aiDetails={aiDetails} getOpenApi={getOpenApi}/>
-    <AddSite siteModal={siteModal} setSiteModal={setSiteModal} getSiteDetails={getSiteDetails}/>
+    <AddSite siteModal={siteModal} setSiteModal={setSiteModal} getSiteDetails={getSiteDetails} editData={editData} setEditData={setEditData}/>
     </div>
   )
 }

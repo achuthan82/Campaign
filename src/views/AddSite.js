@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import { Modal, ModalBody, ModalHeader, Row, Col, Label, Input, Form, Button, ModalFooter, Spinner } from 'reactstrap'
 import Select from 'react-select'
 import { useForm, Controller } from "react-hook-form"
@@ -23,7 +23,7 @@ const ToastContent = ({ message = null }) => (
     )}
   </>
 )
-const AddSite = ({siteModal, setSiteModal, getSiteDetails}) => {
+const AddSite = ({siteModal, setSiteModal, getSiteDetails, editData, setEditData}) => {
   const token = getToken()
   const form = useForm()
   const [loading, setLoading] = useState(false)
@@ -38,8 +38,8 @@ const AddSite = ({siteModal, setSiteModal, getSiteDetails}) => {
     console.log('data', details)
     setLoading(true)
     const config = {
-      method: 'post',
-      url: `${apiConfig.api.url}site_settings`,
+      method: editData === null ? 'post' : 'put',
+      url: editData === null ? `${apiConfig.api.url}site_settings` : `${apiConfig.api.url}site_settings/${editData.id}`,
       data:{site_name:details.name, site_url:details.url, site_status:details.status.label, username:details.user_name, application_password:details.password },
       headers: { 
         Authorization: `Token ${token}`
@@ -50,11 +50,13 @@ const AddSite = ({siteModal, setSiteModal, getSiteDetails}) => {
       if (response.data.status === 200) {
         toast.success(<ToastContent message={response.data.message} />, { duration:3000 }) 
         getSiteDetails() 
+        setEditData(null)
         setSiteModal(false)
         setValue('name', '')
         setValue('url', '')
         setValue('status', null)
-        setValue('api_key', '')
+        setValue('user_name', '')
+        setValue('password', '')
       } else {
         toast.error(<ToastContent message={response.data.message} />, { duration:3000 })  
       }
@@ -63,16 +65,38 @@ const AddSite = ({siteModal, setSiteModal, getSiteDetails}) => {
       toast.error(<ToastContent message={error.message} />, { duration:3000 })  
     })
   }
+  const close = () => {
+    setValue('name', '')
+    setValue('url', '')
+    setValue('status', '')
+    setValue('user_name', '')
+    setValue('password', '')
+    setEditData(null)
+    setSiteModal(false)
+  }
+  useEffect(() => {
+    if (editData !== null && siteModal) {
+      const statusId =  statusOptions.findIndex(
+        (item) => item.label === editData.site_status
+      )
+      setValue('name', editData.site_name)
+      setValue('url', editData.site_url)
+      setValue('status', statusOptions[statusId])
+      setValue('user_name', editData.username)
+      setValue('password', editData.application_password)
+    }
+
+  }, [siteModal])
  
   return (
     <div>
-       <Modal isOpen={siteModal} size="lg" toggle={() => setSiteModal(!siteModal)}>
-        <ModalHeader toggle={() => setSiteModal(!siteModal)}> </ModalHeader>
+       <Modal isOpen={siteModal} size="lg" toggle={close}>
+        <ModalHeader toggle={close}> </ModalHeader>
         <Form onSubmit={handleSubmit(addOrEditSite)}>
         <ModalBody className='p-3'>
             <div className='mb-1'>
             <div className='mb-1 d-flex justify-content-center'>
-                <h2>Add New Site</h2>
+                <h2>{ editData === null ? 'Add New Site' : 'Edit Site' }</h2>
             </div>
             </div>
             <Row className='mb-1'>
@@ -189,7 +213,7 @@ const AddSite = ({siteModal, setSiteModal, getSiteDetails}) => {
         </ModalBody>
         <ModalFooter className='d-flex justify-content-center'>
             <Button color='primary' type="submit" disabled={loading}>{loading && <Spinner size="sm" className='me-50' />} Submit</Button>
-            <Button onClick={() => setSiteModal(!siteModal)}>Cancel</Button>
+            <Button onClick={close}>Cancel</Button>
         </ModalFooter>
         </Form>
       </Modal>
