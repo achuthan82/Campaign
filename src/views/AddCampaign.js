@@ -267,6 +267,7 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
       setValue('category', null)
       setEditData(null)
       setFiles([])
+      setUploadedImage('')
     }
   return (
     <div>

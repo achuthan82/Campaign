@@ -15,6 +15,7 @@ import { isObjEmpty } from "@utils"
 import Dashboard from "../../views/Dashboard"
 import Settings from "../../views/Settings"
 import User from "../../views/users/User"
+import SingleCampaign from "../../views/SingleCampaign"
 // import OrderSummary from "../../views/OrderSummary"
 // import OrderStates from "../../views/OrderStates"
 // import StateDetails from "../../views/StateDetails"
@@ -102,6 +103,10 @@ const Routes = [
   {
     path:'/dashboard',
     element:<Dashboard/>
+  },
+  {
+    path:'/dashboard/:id',
+    element:<SingleCampaign/>
   },
   {
     path:'/settings',

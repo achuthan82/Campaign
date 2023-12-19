@@ -11,6 +11,8 @@ import { toast } from 'react-hot-toast'
 import moment from "moment"
 import ComponentSpinner from '@components/spinner/Loading-spinner'
 import { TRUE } from 'sass'
+import Swal from "sweetalert2"
+import withReactContent from "sweetalert2-react-content"
 
 const ToastContent = ({ message = null }) => (
   <>
@@ -28,6 +30,7 @@ const ToastContent = ({ message = null }) => (
 )
 const Settings = () => {
     const token = getToken()
+    const MySwal = withReactContent(Swal)
     const [keyModal, setKeyModal] = useState(false)
     const [siteModal, setSiteModal] = useState(false)
     const [siteData, setSiteData] = useState([])
@@ -39,65 +42,6 @@ const Settings = () => {
        setEditData(row)
        setSiteModal(true)
     }
-    const columns = [
-        {
-            name: 'Name',
-            selector: 'site_name',
-            sortable: true
-        },
-        {
-            name: 'URL',
-            selector: 'site_url',
-            sortable: true,
-            cell: row => {
-              console.log('row', row)
-              return (
-                  <span>
-                    <a href={row.site_url} target="_blank">{row.site_url}</a>
-                  </span>
-              )
-          }
-        },
-        {
-            name: 'Status',
-            selector: 'status',
-            sortable: true,
-            cell: row => {
-                console.log('row', row)
-                return (
-                    <span>
-                     <Badge color={row.site_status === 'Active' ? 'light-success' : 'light-warning'}>{row.site_status}</Badge>
-                    </span>
-                )
-            }
-            // minWidth: '152px'
-        },
-        {
-            name: 'Action',
-            allowOverflow: true,
-            minWidth: '100px',
-            cell: (row) => {
-             console.log(row)
-              return (
-                <div className='d-flex align-items-center'>
-                <span className='me-1'  onClick={() => editOpen(row)}><Edit size={15}/></span>
-                <span className='me-1'><Trash size={15}/></span>
-
-                <UncontrolledDropdown >
-                  <DropdownToggle className='pr-1' tag='span' style={{cursor:'pointer'}}>
-                    <MoreVertical size={15}  />
-                  </DropdownToggle>
-                  {/* <DropdownMenu className= {index === 0 ? 'notification-dropdown' : ''} >
-                      <DropdownItem className='w-100'><Edit size={18} className='me-50' />Edit</DropdownItem>
-                      <DropdownItem className='w-100'><Delete size={18} className='me-50'/>Delete</DropdownItem>
-                  </DropdownMenu> */}
-                </UncontrolledDropdown>
-                </div>
-              )
-            }
-          }
-
-    ]
     // const data = [
     //     {
     //       name:'Test 1',
@@ -160,9 +104,137 @@ const Settings = () => {
         toast.error(<ToastContent message={error.message} />, { duration:3000 })  
       })
     }
+
+    const handleDelete = (id) => {
+      return MySwal.fire({
+        title: "Are you sure?",
+        text: "You want to delete!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, Confirm!",
+        customClass: {
+          confirmButton: "btn btn-primary",
+          cancelButton: "btn btn-danger ms-1"
+        },
+        buttonsStyling: false
+      }).then(function (result) {
+        if (result.value) {
+       
+          const config = {
+            method: "delete",
+            url: `${apiConfig.api.url}site_settings/${id}`,
+            headers: {
+              ContentType: "application/json",
+              Authorization: `Token ${token}`
+            }
+          }
+          console.log(config)
+          axios(config)
+            .then((response) => {
+              console.log(response.data.status)
+              if (response.data.status === 200) {
+                // setCurrentPage(0)
+                // getUsers(1, rowsPerPage)
+                getSiteDetails()
+                MySwal.fire({
+                  icon: "success",
+                  title: "Deleted!",
+                  text: "Successfully Deleted.",
+                  customClass: {
+                    confirmButton: "btn btn-success"
+                  }
+                })
+              } else if (
+                response.data.status > 200 &&
+                response.data.status < 299
+              ) {
+                toast.error(<ToastContent message={response.data.message} />, { duration:3000 })  
+              } else if (response.data.status === 401) {
+                toast.error(<ToastContent message={response.data.message} />, { duration:3000 })  
+
+                // history.push("/login")
+              }  else {
+                toast.error(<ToastContent message={response.data.message} />, { duration:3000 })  
+              }
+            })
+            .catch((error) => {
+              console.log(error)
+              toast.error(<ToastContent message={response.data.message} />, { duration:3000 })  
+            })
+        } else if (result.dismiss === MySwal.DismissReason.cancel) {
+          MySwal.fire({
+            title: "Cancelled",
+            text: "Update Cancelled",
+            icon: "error",
+            customClass: {
+              confirmButton: "btn btn-success"
+            }
+          })
+        }
+      })
+    }
+    const columns = [
+      {
+          name: 'Name',
+          selector: 'site_name',
+          sortable: true
+      },
+      {
+          name: 'URL',
+          selector: 'site_url',
+          sortable: true,
+          cell: row => {
+            console.log('row', row)
+            return (
+                <span>
+                  <a href={row.site_url} target="_blank">{row.site_url}</a>
+                </span>
+            )
+        }
+      },
+      {
+          name: 'Status',
+          selector: 'status',
+          sortable: true,
+          cell: row => {
+              console.log('row', row)
+              return (
+                  <span>
+                   <Badge color={row.site_status === 'Active' ? 'light-success' : 'light-warning'}>{row.site_status}</Badge>
+                  </span>
+              )
+          }
+          // minWidth: '152px'
+      },
+      {
+          name: 'Action',
+          allowOverflow: true,
+          minWidth: '100px',
+          cell: (row) => {
+           console.log(row)
+            return (
+              <div className='d-flex align-items-center'>
+              <span className='me-1' style={{cursor:'pointer'}}  onClick={() => editOpen(row)}><Edit size={15}/></span>
+               <span className='me-1' style={{cursor:'pointer'}} onClick={() => handleDelete(row.id)}><Trash size={15}/></span> 
+
+              {/* <UncontrolledDropdown >
+                <DropdownToggle className='pr-1' tag='span' style={{cursor:'pointer'}}>
+                  <MoreVertical size={15}  />
+                </DropdownToggle>
+              </UncontrolledDropdown> */}
+              </div>
+            )
+          }
+        }
+
+  ]
     const addOpen = () => {
       setEditData(null)
       setSiteModal(true)
+    }
+    const handleCopy = (data) => {
+      navigator.clipboard.writeText(data)
+      toast.success(<ToastContent message='Text copied to clipboard'/>, { duration:3000 })  
     }
     useEffect(() => {
       getSiteDetails()
@@ -190,7 +262,7 @@ const Settings = () => {
                   </div>
                   <div className='mb-1'>
                     <span className='me-1'>{aiDetails.openai_api_key}</span>
-                    <span><Copy size={15}/></span>
+                    <span style={{cursor:'pointer'}} onClick={() => handleCopy(aiDetails.openai_api_key)}><Copy size={15}/></span>
                   </div>
                   <div>
                     <small>{aiDetails.created_at === aiDetails.updated_at ? 'Added on' : 'Updated on'} {aiDetails.created_at === aiDetails.updated_at ? moment(aiDetails.created_at, "ddd, DD MMM YYYY HH:mm:ss [GMT]").format('DD-MM-YYYY hh:mm A') : moment(aiDetails.updated_at, "ddd, DD MMM YYYY HH:mm:ss [GMT]").format('DD-MM-YYYY hh:mm A')  }</small>

@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import {Button, Row, Col, Modal, ModalBody, ModalHeader, ModalFooter, Label, Input, Form, Spinner } from 'reactstrap'
 import Select from "react-select"
 import { useForm, Controller } from "react-hook-form"
@@ -20,22 +20,24 @@ const ToastContent = ({ message = null }) => (
       )}
     </>
   )
-const AddUser = ({modalOpen, setModalOpen}) => {
+const AddUser = ({modalOpen, setModalOpen, getUsers, rowsPerPage, setCurrentPage, editData, setEditData}) => {
   const [loading, setLoading] = useState(false)
   const roleOptions = [{label:'Admin', value:1}, {label:'Agent', value:2}]
   const form = useForm()
   const {
     control,
     handleSubmit,
-    // setValue,
+    setValue,
+    setError,
+    reset,
     formState: { errors }
   } = form
   const addUser = (data) => {
     console.log('data', data)
     setLoading(true)
     const config = {
-        method: 'post',
-        url: `${apiConfig.api.url}user`,
+        method: editData === null ? 'post' : 'put',
+        url: editData === null ?  `${apiConfig.api.url}user` : `${apiConfig.api.url}user/edit_other_user_info/${editData.id}`,
        
         data: { email: data.loginEmail,
             first_name: data.first_name, 
@@ -47,7 +49,14 @@ const AddUser = ({modalOpen, setModalOpen}) => {
         setLoading(false)
         console.log('response', response)
         if (response.data.status === 200) {
-            toast.success(<ToastContent message={response.data.message} />, { duration:3000 })  
+            toast.success(<ToastContent message={response.data.message} />, { duration:3000 }) 
+            setValue('loginEmail', '')
+            setValue('first_name', '')
+            setValue('last_name', '')
+            setValue('role', null)
+            setEditData(null)
+            setCurrentPage(0) 
+            getUsers(1, rowsPerPage)
             setModalOpen(false)
         } else {
             toast.error(<ToastContent message={response.data.message} />, { duration:3000 })  
@@ -57,16 +66,38 @@ const AddUser = ({modalOpen, setModalOpen}) => {
         toast.error(<ToastContent message='Network Error' />, { duration:3000 })  
  
     })
+  } 
+  const close = () => {
+    setValue('loginEmail', '')
+    setValue('first_name', '')
+    setValue('last_name', '')
+    setValue('role', null)
+    setEditData(null)
+    setModalOpen(false)
+    setError(null)
+    reset()
   }
+   useEffect(() => {
+     if (modalOpen && editData !== null) {
+      const roleId =  roleOptions.findIndex(
+        (item) => item.value === editData.role_id
+      )
+      console.log('roleId', roleId)
+      setValue('loginEmail', editData.email)
+      setValue('first_name', editData.first_name)
+      setValue('last_name', editData.last_name)
+      setValue('role', roleOptions[roleId])
+     }
+  }, [modalOpen])
   return (
     <div>
-      <Modal isOpen={modalOpen} size="md" toggle={() => setModalOpen(!modalOpen)}>
-        <ModalHeader toggle={() => setModalOpen(!modalOpen)}> </ModalHeader>
+      <Modal isOpen={modalOpen} size="md" toggle={close}>
+        <ModalHeader toggle={close}> </ModalHeader>
         <Form onSubmit={handleSubmit(addUser)}>
         <ModalBody className='p-3'>
             <div className='mb-1'>
             <div className='mb-1 d-flex justify-content-center'>
-                <h2>Create New User</h2>
+                <h2>{editData === null ? 'Create New User' : 'Edit User' }</h2>
             </div>
             </div>
         
@@ -173,8 +204,7 @@ const AddUser = ({modalOpen, setModalOpen}) => {
         </ModalBody>
         <ModalFooter className='d-flex justify-content-center'>
             <Button color='primary' disabled={loading}>{loading && <Spinner size="sm" className='me-50'/>} Submit</Button>
-            <Button onClick={() => setModalOpen(false)}>Cancel</Button>
-
+            <Button onClick={close} type='reset'>Cancel</Button>
         </ModalFooter>
         </Form>
       </Modal>

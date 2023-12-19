@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from "react"
+import { useNavigate } from "react-router-dom"
 import { MoreHorizontal, MoreVertical, ArrowRightCircle, Plus, Edit2, Grid, List } from "react-feather"
 import { Row, Col, Input, Button, Card, CardBody, Badge, UncontrolledDropdown, DropdownItem, DropdownMenu, DropdownToggle, ButtonGroup } from "reactstrap"
 import AddCampaign from "./AddCampaign"
@@ -27,6 +28,7 @@ const ToastContent = ({ message = null }) => (
 
 const Dashboard = () => {
   const token = getToken()
+  const navigate = useNavigate()
   const [modalOpen, setModalOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [campaignList, setCampaignList] = useState([])
@@ -66,7 +68,9 @@ const Dashboard = () => {
     getCampaign()
     // getCategory()
   }, [])
-
+  const moveTo = (item) => {
+    navigate(`/dashboard/${item.id}`)
+  }
   const campaignColor = { backgroundColor:'rgba(70, 46, 149, 0.03)' }
   return (
     <div>
@@ -150,7 +154,7 @@ const Dashboard = () => {
                     </span>
                   </Col>
                   <Col className="d-flex justify-content-end">
-                    <Button color="primary" size="sm">
+                    <Button color="primary" size="sm" onClick={() => moveTo(item)}>
                       <span>
                         <ArrowRightCircle size={20} />
                       </span>
