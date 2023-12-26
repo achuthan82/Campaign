@@ -132,11 +132,11 @@ const AddSite = ({siteModal, setSiteModal, getSiteDetails, editData, setEditData
                         <Input type="text" {...field} placeholder="Enter URL" />
                       )}
                       rules={{
-                        required: 'URL is required',
-                        pattern: {
-                          value: /^(ftp|http|https):\/\/[^ "]+$/,
-                          message: 'Invalid URL format'
-                        }
+                        required: 'URL is required'
+                        // pattern: {
+                        //   value: /^(ftp|http|https):\/\/[^ "]+\.com(\/|$)$/,
+                        //   message: 'Invalid URL format'
+                        // }
                       }}
                     />
                   {errors.url && <p className='text-danger'>{errors.url.message}</p>}

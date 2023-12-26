@@ -34,11 +34,13 @@ const Dashboard = () => {
   const [campaignList, setCampaignList] = useState([])
   const [editData, setEditData] = useState(null)
   const [view, setView] = useState("list")
-  const getCampaign = () => {
+  const [searchValue, setSearchValue] = useState('')
+  const getCampaign = (val) => {
     setLoading(true)
     const config = {
-      method: 'get',
-      url: `${apiConfig.api.url}list_campaign?time_zone=asia/kolkata`,
+      method: 'post',
+      url: `${apiConfig.api.url}list_campaign`,
+      data:{time_zone:"asia/kolkata", post_title: val},
       headers: { 
         Authorization: `Token ${token}`
       }
@@ -63,7 +65,12 @@ const Dashboard = () => {
      setEditData(item)
      setModalOpen(true)
   }
-  
+  const handleSearch = (event) => {
+    setSearchValue(event.target.value)
+    setTimeout(() => {
+      getCampaign(event.target.value)
+    }, 1000)
+  }
   useEffect(() => {
     getCampaign()
     // getCategory()
@@ -81,7 +88,7 @@ const Dashboard = () => {
         <Col className="d-flex justify-content-end ">
           
             <span className="me-1">
-             <Input type="text" placeholder="search"></Input>
+             <Input type="text" placeholder="search" value={searchValue} onChange={(event) => handleSearch(event) }></Input>
              </span>
            
               <Button color="primary" className="me-1" onClick={() => { setModalOpen(true); setEditData(null) }}><span className="me-50"><Plus size={15}></Plus></span>Add New</Button>
@@ -115,8 +122,7 @@ const Dashboard = () => {
       </Row>
       <Row>
         {
-          campaignList && campaignList.length > 0 && 
-          campaignList.map((item, index) => {
+          campaignList && campaignList.length > 0 ?    campaignList.map((item, index) => {
             return (
               <Col md={6} lg={view === 'list' ? 12 : 4} key={item.id}>
             <Card className="campaign-card" style={ index % 2 !== 0 ? campaignColor : null}>
@@ -165,7 +171,7 @@ const Dashboard = () => {
             </Card>
           </Col>
             )
-          })
+          }) : <div className="text-center mt-5"><h4>No Campaigns to display</h4></div>
          
         }
         
@@ -256,7 +262,7 @@ const Dashboard = () => {
           </Card>
         </Col> */}
       </Row>
-      <AddCampaign modalOpen={modalOpen} setModalOpen={setModalOpen} editData={editData} getCampaign={getCampaign} setEditData={setEditData}/>
+      <AddCampaign modalOpen={modalOpen} setModalOpen={setModalOpen} editData={editData} getCampaign={getCampaign} setEditData={setEditData} searchValue={searchValue} setSearchValue={setSearchValue}/>
       {loading && <ComponentSpinner txt="Loading.."/>}
     </div>
   )

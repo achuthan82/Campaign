@@ -44,8 +44,10 @@ const RegisterBasic = () => {
     getValues
   } = useForm({ })
   const [loading, setLoading] = useState(false)
+  localStorage.removeItem('accessToken')
   const data = useParams()
-  const token = data.token
+  const register_token = data.token
+  console.log('data', data)
   const onSubmit = data => {
     if (Object.values(data).every(field => field.length > 0)) {
       setLoading(true)
@@ -53,7 +55,7 @@ const RegisterBasic = () => {
         method: 'put',
         url: `${apiConfig.api.url}user/register_from_invitation`,
         headers: { 
-          Authorization: `Token ${token}`
+          Authorization: `Token ${register_token}`
         },
         data: { password: data.password, confirm_password: data.confirmPassword }
       }

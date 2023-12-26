@@ -36,16 +36,19 @@ const User = () => {
     const [currentPage, setCurrentPage] = useState(0)
     const [paginatedData, setPaginatedData] = useState(null)
     const [editData, setEditData] = useState(null)
+    const [searchValue, setSearchValue] = useState('')
+
     const editOpen = (row) => {
       setEditData(row)
       setModalOpen(true)
     }
  
-    const getUsers = (page, per_page) => {
+    const getUsers = (page, per_page, value) => {
       setPending(true)
       const config = {
-        method: 'get',
-        url: `${apiConfig.api.url}user/paginated_list?page=${page}&per_page=${per_page}&time_zone='asia/kolkata'`,
+        method: 'post',
+        url: `${apiConfig.api.url}user/paginated_list?page=${page}&per_page=${per_page}`,
+        data:{time_zone:"asia/kolkata", first_name: value},
         headers: { 
           Authorization: `Token ${token}`
         }
@@ -54,6 +57,7 @@ const User = () => {
         console.log(response.data)
         setPending(false)
         if (response.data.status === 200) {
+          console.log('users', response.data.data)
           setUserList(response.data.data)
           setPaginatedData(response.data)
 
@@ -97,7 +101,7 @@ const User = () => {
               console.log(response.data.status)
               if (response.data.status === 200) {
                 setCurrentPage(0)
-                getUsers(1, rowsPerPage)
+                getUsers(1, rowsPerPage, searchValue)
                 MySwal.fire({
                   icon: "success",
                   title: "Deleted!",
@@ -135,10 +139,13 @@ const User = () => {
         }
       })
     }
+    useEffect(() => {
+      console.log('users', userList)
+    }, [userList])
     const columns = [
       {
           name: 'Name',
-          selector:'first_name',
+          selector: row => row.first_name,
           sortable: true,
           cell: (row, index) => {
             const name = row.first_name.concat(' ').concat(row.last_name)
@@ -204,6 +211,13 @@ const User = () => {
       setTimeout(() => {
         getUsers(1, event.target.value)
       }, 300)
+    }
+
+    const handleSearch = (event) => {
+      setSearchValue(event.target.value)
+      setTimeout(() => {
+        getUsers(1, rowsPerPage, event.target.value)
+      }, 1000)
     }
   
     const CustomPagination = () => (
@@ -272,6 +286,8 @@ const User = () => {
               type='text'
               placeholder='Search'
               id='search-input'
+              value={searchValue} 
+              onChange={(event) => handleSearch(event) }
             />
             </div>
             <Button color='primary' onClick={addOpen}><span className='me-50'><Plus size={15}/></span> Add User</Button>

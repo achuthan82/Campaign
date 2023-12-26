@@ -61,7 +61,9 @@ const Settings = () => {
       const config = {
         method: 'get',
         url: `${apiConfig.api.url}site_settings`,
+        // data:{site_name: ''},
         headers: { 
+          ContentType: "application/json",
           Authorization: `Token ${token}`
         }
       }

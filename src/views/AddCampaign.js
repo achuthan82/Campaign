@@ -27,7 +27,7 @@ const ToastContent = ({ message = null }) => (
     )}
   </>
 )
-const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditData}) => {
+const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditData, setSearchValue}) => {
     console.log(modalOpen)
     const form = useForm()
     const {
@@ -37,7 +37,7 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
       formState: { errors }
     } = form
     const token = getToken()
-    const intervalOptions = [{label:'10 mins', value:10}, {label:'20 mins', value:20}]
+    const intervalOptions = [{label:'15 mins', value:10}, {label:'30 mins', value:20}, {label:'1 hour', value:1}, {label:'6 hours', value:6}, {label:'24 hours', value:24}, {label:'72 hours', value:72}]
     const [files, setFiles] = useState([])
     const [selected, setSelected] = useState([])
     const [siteOptions, setSiteOptions] = useState([])
@@ -47,6 +47,9 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
     const [categoryOptions, setCategoryOptions] = useState([])
     const [loading, setLoading] = useState(false)
     const [uploadedImage, setUploadedImage] = useState('')
+    const [questions, setQuestions] = useState('')
+    const [formatQuestions, setFormatQuestion] = useState([])
+    const [siteUrl, setSiteUrl] = useState('')
     const { getRootProps, getInputProps } = useDropzone({
       onDrop: acceptedFiles => {
         console.log(acceptedFiles[0])
@@ -98,13 +101,15 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
     //   setFiles([])
     // }
     const addOrEditCampaign = (data) => {
+      console.log('questions', formatQuestions.join('$'))
       setLoading(true)
       console.log('data', data)
       const formData = new FormData()
       const categoryData = data.category.map((item) => {
         return item.label
       })
-      formData.append("questions", data.questions)
+      // formData.append("questions", formatQuestions.length > 0 ? formatQuestions.join('$$') : questions)
+      formData.append("questions", questions)
       formData.append("prompt", data.prompt)
       formData.append("post_title", data.title)
       formData.append("post_content", data.content)
@@ -137,9 +142,11 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
           setValue('interval', null)
           setValue('site', null)
           setValue('category', null)
+          setQuestions('')
           setEditData(null)
           setModalOpen(false) 
-          getCampaign()
+          setSearchValue('')
+          getCampaign('')
         } else {
           toast.error(<ToastContent message={response.data.message} />, { duration:3000 })
         }
@@ -162,7 +169,7 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
         setSiteLoading(false)
         if (response.data.status === 200) {
           const formatData = response.data.data.map((item) => {
-            return {label: item.site_name, value:item.id}
+            return {label: item.site_name, value:item.id, url:item.site_url}
           })
           setSiteOptions(formatData)
           console.log('site data', formatData)
@@ -179,11 +186,12 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
     const getCategoryDetails = () => {
       setCategoryLoading(true)
       const config = {
-        method: 'get',
+        method: 'post',
         url: `${apiConfig.api.url}category`,
         headers: { 
           Authorization: `Token ${token}`
-        }
+        },
+        data : {site_url: siteUrl}
       }
       axios(config).then((response) => {
         console.log('response', response)
@@ -204,16 +212,19 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
     useEffect(() => {
       if (modalOpen) {
       getSiteDetails()
-      getCategoryDetails()
+      // getCategoryDetails()
       if (editData !== null) {
+        console.log('editData', editData)
         const intervalId =  intervalOptions.findIndex(
           (item) => item.value === editData.post_interval
         )
         setValue('content', editData.post_content)
         setValue('questions', editData.questions)
+        setQuestions(editData.questions)
         setValue('prompt', editData.prompt)
         setValue('title', editData.post_title)
         setValue('interval', intervalOptions[intervalId])
+        setSiteUrl(editData.site_url)
         const fileDetails =  {
           path: 'Credit Card bill.pdf',
           name: 'Uploaded Image',
@@ -234,6 +245,9 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
     setFiles([customFile])
     setUploadedImage(editData.url)
 
+      } else {
+        setQuestions('')
+        setFormatQuestion([])
       }
     }
     }, [modalOpen])
@@ -247,8 +261,23 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
         setValue('site', siteOptions[siteId])
        }
     }, [modalOpen, siteOptions.length])
+    
+    useEffect(() => {
+      if (siteUrl !== '') {
+      getCategoryDetails()
+      }
+    }, [siteUrl])
+    const handleKeyDown = (event, currentQuestion) => {
+      if (event.code === "Enter") {
+        const questionParts = currentQuestion.split('\n')
+        const data = [...formatQuestions, questionParts[questionParts.length - 1]]
+        console.log('data', data)
+        setFormatQuestion(data)
+      }
+    }
     useEffect(() => {
       if (categoryOptions.length > 0  && editData !== null) {
+        console.log('category-options', categoryOptions)
         const categoryId =  editData.category_info.map((item) => {
           return categoryOptions[categoryOptions.findIndex((data) => data.value === item.category_id)]
         })
@@ -265,9 +294,19 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
       setValue('interval', null)
       setValue('site', null)
       setValue('category', null)
+      setSiteUrl('')
       setEditData(null)
       setFiles([])
       setUploadedImage('')
+      setFormatQuestion([])
+      setQuestions('')
+    }
+    useEffect(() => {
+      console.log('questions', questions)
+    }, [questions])
+    const siteChange = (event) => {
+      console.log('site-event', event)
+      setSiteUrl(event.url)
     }
   return (
     <div>
@@ -302,6 +341,7 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
                         invalid={errors.site}
                         onChange={(event) => {
                           field.onChange(event)
+                          siteChange(event)
                         }}
                       ></Select>
                       {errors.site && (
@@ -328,6 +368,11 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
                       id="questions"
                       placeholder='Question one per line'
                       invalid={errors.questions}
+                      onChange={(event) => {
+                         setQuestions(event.target.value)                           
+                        field.onChange(event)
+                      }}
+                      onKeyDown={(event) => handleKeyDown(event, field.value)}
                     />
                   )}
                 />
@@ -363,6 +408,9 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
                       {errors.category && (
                         <p className="text-danger">{errors.category.message}</p>
                       )}
+                      {
+                        siteUrl === '' && <p className='text-warning'>Please choose a site to continue </p>
+                      }
                     </>
                   )}
                 />
