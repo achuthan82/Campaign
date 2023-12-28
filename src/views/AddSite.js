@@ -23,7 +23,7 @@ const ToastContent = ({ message = null }) => (
     )}
   </>
 )
-const AddSite = ({siteModal, setSiteModal, getSiteDetails, editData, setEditData}) => {
+const AddSite = ({siteModal, setSiteModal, getSiteDetails, editData, setEditData, setSearchValue}) => {
   const token = getToken()
   const form = useForm()
   const [loading, setLoading] = useState(false)
@@ -57,6 +57,7 @@ const AddSite = ({siteModal, setSiteModal, getSiteDetails, editData, setEditData
         setValue('status', null)
         setValue('user_name', '')
         setValue('password', '')
+        setSearchValue('')
       } else {
         toast.error(<ToastContent message={response.data.message} />, { duration:3000 })  
       }

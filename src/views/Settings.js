@@ -38,6 +38,8 @@ const Settings = () => {
     const [aiDetails, setAiDetails] = useState(null)
     const [loading, setLoading] = useState(false)
     const [editData, setEditData] = useState(null)
+    const [searchValue, setSearchValue] = useState('')
+
     const editOpen = (row) => {
        setEditData(row)
        setSiteModal(true)
@@ -56,12 +58,12 @@ const Settings = () => {
   
     //       }
     // ]
-    const getSiteDetails = () => {
+    const getSiteDetails = (value) => {
       setPending(true)
       const config = {
-        method: 'get',
-        url: `${apiConfig.api.url}site_settings`,
-        // data:{site_name: ''},
+        method: 'post',
+        url: `${apiConfig.api.url}site_search`,
+        data:{search: value},
         headers: { 
           ContentType: "application/json",
           Authorization: `Token ${token}`
@@ -174,6 +176,13 @@ const Settings = () => {
           })
         }
       })
+    }
+
+    const handleSearch = (event) => {
+      setSearchValue(event.target.value)
+      setTimeout(() => {
+        getSiteDetails(event.target.value)
+      }, 1000)
     }
     const columns = [
       {
@@ -300,13 +309,7 @@ const Settings = () => {
             </div>
             <div className='d-flex align-items-end justify-content-sm-end mt-sm-0 mt-1'>
             <div className='me-1'>
-          
-            <Input
-              className='dataTable-filter'
-              type='text'
-              placeholder='Search'
-              id='search-input'
-            />
+            <Input type="text" placeholder="search" value={searchValue} onChange={(event) => handleSearch(event) }></Input>
             </div>
             <Button color="primary" onClick={addOpen}><span className='me-50'><Plus size={15}/></span><span>Add New </span></Button>
             </div>
@@ -326,7 +329,7 @@ const Settings = () => {
       {loading && <ComponentSpinner txt="Loading.."/>}
 
     <KeyEditModal keyModal={keyModal} setKeyModal={setKeyModal} aiDetails={aiDetails} getOpenApi={getOpenApi}/>
-    <AddSite siteModal={siteModal} setSiteModal={setSiteModal} getSiteDetails={getSiteDetails} editData={editData} setEditData={setEditData}/>
+    <AddSite siteModal={siteModal} setSiteModal={setSiteModal} getSiteDetails={getSiteDetails} editData={editData} setEditData={setEditData} searchValue={searchValue} setSearchValue={setSearchValue}/>
     </div>
   )
 }

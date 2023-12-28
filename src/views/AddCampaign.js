@@ -37,7 +37,7 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
       formState: { errors }
     } = form
     const token = getToken()
-    const intervalOptions = [{label:'15 mins', value:10}, {label:'30 mins', value:20}, {label:'1 hour', value:1}, {label:'6 hours', value:6}, {label:'24 hours', value:24}, {label:'72 hours', value:72}]
+    const intervalOptions = [{label:'15 mins', value:10}, {label:'30 mins', value:20}, {label:'1 hour', value:1}, {label:'12 hours', value:12}, {label:'6 hours', value:6}, {label:'24 hours', value:24}, {label:'72 hours', value:72}]
     const [files, setFiles] = useState([])
     const [selected, setSelected] = useState([])
     const [siteOptions, setSiteOptions] = useState([])
