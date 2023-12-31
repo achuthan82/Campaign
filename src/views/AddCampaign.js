@@ -27,7 +27,7 @@ const ToastContent = ({ message = null }) => (
     )}
   </>
 )
-const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditData, setSearchValue}) => {
+const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditData, setSearchValue, setCurrentPage}) => {
     console.log(modalOpen)
     const form = useForm()
     const {
@@ -146,7 +146,8 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
           setEditData(null)
           setModalOpen(false) 
           setSearchValue('')
-          getCampaign('')
+          setCurrentPage(0)
+          getCampaign(1, '')
         } else {
           toast.error(<ToastContent message={response.data.message} />, { duration:3000 })
         }
@@ -200,6 +201,7 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
           setCategoryOptions(response.data.data)
         } else if (response.data.status === 204) {
           setCategoryOptions([])
+          toast.error(<ToastContent message={response.data.message} />, { duration:3000 })  
         } else {
           toast.error(<ToastContent message={response.data.message} />, { duration:3000 })  
         }
@@ -324,7 +326,7 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
             </div>
             <Row className='mb-1'>
                 <Col>
-                <Label>Choose Site</Label>
+                <Label>Choose Site<span className='text-danger'>*</span></Label>
                 <Controller
                   control={control}
                   name="site"
@@ -354,7 +356,7 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
             </Row>
             <Row className='mb-1'>
                 <Col>
-                  <Label>Add Questions</Label>
+                  <Label>Add Questions <span className='text-danger'>*</span></Label>
                   <Controller
                   control={control}
                   name="questions"
@@ -382,7 +384,7 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
             <Row className='mb-1'>
                 <Col>
                   <div className='d-flex justify-content-between'>
-                   <Label>Categories</Label>
+                   <Label>Categories<span className='text-danger'>*</span></Label>
                    <h6 className='card-text-log'>Create Categories if not existing</h6>
                   </div>
                   <Controller
@@ -418,7 +420,7 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
             </Row>
             <Row className='mb-1'>
                 <Col>
-                  <Label>Prompt</Label>
+                  <Label>Prompt <span className='text-danger'>*</span></Label>
                   <Controller
                   control={control}
                   name="prompt"
@@ -440,7 +442,7 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
             </Row>
             <Row className='mb-1'>
                 <Col>
-                  <Label>Post Title</Label>
+                  <Label>Post Title <span className='text-danger'>*</span></Label>
                   <Controller
                   control={control}
                   name="title"
@@ -462,7 +464,7 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
             </Row>
             <Row className='mb-1'>
                 <Col>
-                  <Label>Post Content</Label>
+                  <Label>Post Content <span className='text-danger'>*</span></Label>
                   <Controller
                   control={control}
                   name="content"
@@ -485,7 +487,7 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
             </Row>
             <Row className='mb-1'>
                 <Col>
-                  <Label>Post Interval</Label>
+                  <Label>Post Interval <span className='text-danger'>*</span></Label>
                   <Controller
                   control={control}
                   name="interval"
@@ -539,7 +541,7 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
             </div> */}
           </Fragment>
         ) : null}
-        { uploadedImage !== '' && <Row className='mt-1'>
+        { uploadedImage !== '' && uploadedImage !== "https://dall-e-article-images.s3.amazonaws.com/None" && <Row className='mt-1'>
           <Col>
           <h6>Uploaded Image</h6>
           <img src={uploadedImage} alt="uploaded image" style={{width:'200px'}}></img>

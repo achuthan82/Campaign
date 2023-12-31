@@ -34,10 +34,10 @@ const ToastContent = ({ message = null }) => (
   </>
 )
 const ResetPasswordBasic = () => {
+  localStorage.removeItem('accessToken')
   const navigate = useNavigate('/login')
   const params = useParams() 
-  const token = params.token
-  console.log('token', token)
+  const register_token = params.token
   console.log('params', params)
   const {
     control,
@@ -55,7 +55,7 @@ const ResetPasswordBasic = () => {
         method: 'patch',
         url: `${apiConfig.api.url}auth/reset_password`,
         headers: { 
-          Authorization: `Token ${token}`
+          Authorization: `Token ${register_token}`
         },
         data: { new_password: data.password, confirm_password:data.confirmPassword}
       }
@@ -88,7 +88,12 @@ const ResetPasswordBasic = () => {
       }
     }
   }
-
+  const handleKeyDown = (event) => {
+    console.log('event', event)
+    if (event.key === ' ') {
+      event.preventDefault()
+    }
+  }
   return (
     <div className='auth-wrapper auth-basic px-2'>
       <div className='auth-inner my-2'>
@@ -115,7 +120,7 @@ const ResetPasswordBasic = () => {
                     required: 'This field is required'
                   }}
                   render={({ field }) => (
-                    <InputPasswordToggle className='input-group-merge' invalid={errors.password && true} {...field} />
+                    <InputPasswordToggle className='input-group-merge' invalid={errors.password && true} {...field} onKeyDown={handleKeyDown} />
                   )}
                 />
                 {errors.password && <p className='text-danger'>{errors.password.message}</p>}
@@ -133,7 +138,7 @@ const ResetPasswordBasic = () => {
                     validate: (value) => value === getValues('password') || 'Passwords do not match'
                   }}
                   render={({ field }) => (
-                    <InputPasswordToggle className='input-group-merge' invalid={errors.confirmPassword && true} {...field} />
+                    <InputPasswordToggle className='input-group-merge' invalid={errors.confirmPassword && true} {...field} onKeyDown={handleKeyDown}/>
                   )}
                 />
                  {errors.confirmPassword && <p className='text-danger'>{errors.confirmPassword.message}</p>}

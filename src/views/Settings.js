@@ -10,6 +10,7 @@ import { getToken } from '@utils'
 import { toast } from 'react-hot-toast'
 import moment from "moment"
 import ComponentSpinner from '@components/spinner/Loading-spinner'
+import ReactPaginate from "react-paginate"
 import { TRUE } from 'sass'
 import Swal from "sweetalert2"
 import withReactContent from "sweetalert2-react-content"
@@ -39,6 +40,9 @@ const Settings = () => {
     const [loading, setLoading] = useState(false)
     const [editData, setEditData] = useState(null)
     const [searchValue, setSearchValue] = useState('')
+    const [rowsPerPage, setRowsPerPage] = useState(10)
+    const [currentPage, setCurrentPage] = useState(0)
+    const [paginatedData, setPaginatedData] = useState(null)
 
     const editOpen = (row) => {
        setEditData(row)
@@ -58,11 +62,11 @@ const Settings = () => {
   
     //       }
     // ]
-    const getSiteDetails = (value) => {
+    const getSiteDetails = (page, per_page, value) => {
       setPending(true)
       const config = {
         method: 'post',
-        url: `${apiConfig.api.url}site_search`,
+        url: `${apiConfig.api.url}site_search?page=${page}&per_page=${per_page}`,
         data:{search: value},
         headers: { 
           ContentType: "application/json",
@@ -73,8 +77,10 @@ const Settings = () => {
         console.log('response', response)
         setPending(false)
         if (response.data.status === 200) {
+           setPaginatedData(response.data)
            setSiteData(response.data.data)
         } else if (response.data.status === 204) {
+          setPaginatedData(null)
           setSiteData([])
         } else {
           toast.error(<ToastContent message={response.data.message} />, { duration:3000 })  
@@ -108,7 +114,7 @@ const Settings = () => {
         toast.error(<ToastContent message={error.message} />, { duration:3000 })  
       })
     }
-
+  
     const handleDelete = (id) => {
       return MySwal.fire({
         title: "Are you sure?",
@@ -137,9 +143,8 @@ const Settings = () => {
             .then((response) => {
               console.log(response.data.status)
               if (response.data.status === 200) {
-                // setCurrentPage(0)
-                // getUsers(1, rowsPerPage)
-                getSiteDetails()
+                setCurrentPage(0)
+                getSiteDetails(1, rowsPerPage, searchValue)
                 MySwal.fire({
                   icon: "success",
                   title: "Deleted!",
@@ -180,10 +185,49 @@ const Settings = () => {
 
     const handleSearch = (event) => {
       setSearchValue(event.target.value)
+      setCurrentPage(0)
       setTimeout(() => {
-        getSiteDetails(event.target.value)
+        getSiteDetails(1, rowsPerPage, event.target.value)
       }, 1000)
     }
+    const handlePagination = (page) => {
+      setCurrentPage(page.selected)
+      getSiteDetails(page.selected + 1, rowsPerPage, searchValue)
+    }
+  
+    const handlePerPage = (event) => {
+      setCurrentPage(0)
+      setRowsPerPage(parseInt(event.target.value))
+      setTimeout(() => {
+        getSiteDetails(1, event.target.value, searchValue)
+      }, 300)
+    }
+
+    const CustomPagination = () => (
+      <ReactPaginate
+        previousLabel=""
+        nextLabel=""
+        forcePage={currentPage}
+        onPageChange={(page) => handlePagination(page)}
+        pageCount={
+          paginatedData &&
+          (Math.ceil(paginatedData.pagination.total / rowsPerPage) || 1)
+        }
+        breakLabel="..."
+        pageRangeDisplayed={2}
+        marginPagesDisplayed={2}
+        activeClassName="active"
+        pageClassName="page-item"
+        breakClassName="page-item"
+        nextLinkClassName="page-link"
+        pageLinkClassName="page-link"
+        breakLinkClassName="page-link"
+        previousLinkClassName="page-link"
+        nextClassName="page-item next-item"
+        previousClassName="page-item prev-item"
+        containerClassName="pagination react-paginate separated-pagination pagination-sm justify-content-end pe-1 mt-1"
+      />
+    )
     const columns = [
       {
           name: 'Name',
@@ -248,7 +292,7 @@ const Settings = () => {
       toast.success(<ToastContent message='Text copied to clipboard'/>, { duration:3000 })  
     }
     useEffect(() => {
-      getSiteDetails()
+      getSiteDetails('')
       getOpenApi()
     }, [])
   return (
@@ -267,7 +311,7 @@ const Settings = () => {
                   <div className='d-flex justify-content-between align-items-center mb-1'>
                   <div className='d-flex vertical-align-middle'>
                   <h3 className='me-1'>{ aiDetails.name }</h3>
-                  <span><Badge color='light-primary'>Active</Badge></span>
+                  <span><Badge color='light-primary'>{aiDetails.selected_status ? 'Active' : 'Inactive'}</Badge></span>
                   </div>
                   <span style={{cursor:'pointer'}} onClick={() => setKeyModal(true)}><MoreVertical size={15}></MoreVertical></span>
                   </div>
@@ -293,13 +337,11 @@ const Settings = () => {
             <div className='d-flex align-items-center'>
               <Label for='sort-select' className='me-50'>show</Label>
               <Input
-                className='dataTable-select'
+                // className='dataTable-select'
                 type='select'
                 id='sort-select'
-                // value={rowsPerPage}
-                // onChange={e => handlePerPage(e)}
+                onChange={e => handlePerPage(e)}
               >
-                <option value={7}>7</option>
                 <option value={10}>10</option>
                 <option value={25}>25</option>
                 <option value={50}>50</option>
@@ -317,19 +359,28 @@ const Settings = () => {
          
         <div className='react-dataTable'>
           <DataTable
+            pagination
+            paginationServer
             noHeader
             className='react-dataTable'
             columns={columns}
             sortIcon={<ChevronDown size={10} />}
             data={siteData}
             progressPending={pending}
+            paginationComponent={
+              paginatedData &&
+              paginatedData.hasOwnProperty("pagination") &&
+              CustomPagination
+            }
+            paginationPerPage={rowsPerPage}
+            paginationDefaultPage={currentPage + 1}
           />
         </div>
       </Card>
       {loading && <ComponentSpinner txt="Loading.."/>}
 
     <KeyEditModal keyModal={keyModal} setKeyModal={setKeyModal} aiDetails={aiDetails} getOpenApi={getOpenApi}/>
-    <AddSite siteModal={siteModal} setSiteModal={setSiteModal} getSiteDetails={getSiteDetails} editData={editData} setEditData={setEditData} searchValue={searchValue} setSearchValue={setSearchValue}/>
+    <AddSite siteModal={siteModal} setSiteModal={setSiteModal} getSiteDetails={getSiteDetails} editData={editData} setEditData={setEditData} searchValue={searchValue} setSearchValue={setSearchValue} setCurrentPage={setCurrentPage} rowsPerPage={rowsPerPage}/>
     </div>
   )
 }

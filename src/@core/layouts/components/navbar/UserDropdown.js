@@ -92,7 +92,7 @@ const UserDropdown = () => {
       >
         <div className="user-nav d-sm-flex d-none">
           <span className="user-name fw-bold">{user && user.dt ? user.dt.first_name : 'Kevin'}</span>
-          <span className="user-status">Admin</span>
+          <span className="user-status">{user && user.dt ? user.dt.role_id === 1 ? 'Admin' : 'Agent' : ''}</span>
         </div>
         {/* <Avatar
           img={defaultAvatar}

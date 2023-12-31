@@ -103,7 +103,7 @@ const AddUser = ({modalOpen, setModalOpen, getUsers, rowsPerPage, setCurrentPage
         
             <Row className='mb-1'>
                 <Col>
-                  <Label>First Name</Label>
+                  <Label>First Name<span className='text-danger'>*</span></Label>
                   <Controller
                   control={control}
                   name="first_name"
@@ -127,7 +127,7 @@ const AddUser = ({modalOpen, setModalOpen, getUsers, rowsPerPage, setCurrentPage
          
             <Row className='mb-1'>
                 <Col>
-                  <Label>Last Name</Label>
+                  <Label>Last Name<span className='text-danger'>*</span></Label>
                   <Controller
                   control={control}
                   name="last_name"
@@ -150,7 +150,7 @@ const AddUser = ({modalOpen, setModalOpen, getUsers, rowsPerPage, setCurrentPage
             </Row>
             <Row className='mb-1'>
                 <Col>
-                  <Label>Email</Label>
+                  <Label>Email<span className='text-danger'>*</span></Label>
                   <Controller
                   id='loginEmail'
                   name='loginEmail'
@@ -175,7 +175,7 @@ const AddUser = ({modalOpen, setModalOpen, getUsers, rowsPerPage, setCurrentPage
         
             <Row className='mb-1'>
                 <Col>
-                  <Label>Role</Label>
+                  <Label>Role<span className='text-danger'>*</span></Label>
                   <Controller
                   control={control}
                   name="role"

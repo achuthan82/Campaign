@@ -126,7 +126,12 @@ const Login = () => {
       }
     }
   }
-  
+  const handleKeyDown = (event) => {
+    console.log('event', event)
+    if (event.key === ' ') {
+      event.preventDefault()
+    }
+  }
   return (
     <>
     <div className='auth-wrapper auth-basic px-2'>
@@ -177,7 +182,7 @@ const Login = () => {
                   name='password'
                   control={control}
                   render={({ field }) => (
-                    <InputPasswordToggle className='input-group-merge' invalid={errors.password && true} {...field} />
+                    <InputPasswordToggle className='input-group-merge' invalid={errors.password && true} {...field} onKeyDown={handleKeyDown}/>
                   )}
                 />
                 {errors.password && <span className='text-danger'>This field is required</span>}

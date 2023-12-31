@@ -171,6 +171,20 @@ const User = () => {
           sortable: true
       },
       {
+        name: 'Role',
+        selector: 'role_id',
+        sortable: true,
+        cell: row => {
+            console.log('row', row)
+            return (
+                <span>
+                  {row.role_id === 1 ? 'Admin' : 'Agent'}
+                </span>
+            )
+        }
+        // minWidth: '152px'
+    },
+      {
           name: 'Status',
           selector: 'status',
           sortable: true,
@@ -202,14 +216,14 @@ const User = () => {
   ]
     const handlePagination = (page) => {
       setCurrentPage(page.selected)
-      getUsers(page.selected + 1, rowsPerPage)
+      getUsers(page.selected + 1, rowsPerPage, searchValue)
     }
   
     const handlePerPage = (event) => {
       setCurrentPage(0)
       setRowsPerPage(parseInt(event.target.value))
       setTimeout(() => {
-        getUsers(1, event.target.value)
+        getUsers(1, event.target.value, searchValue)
       }, 300)
     }
 
@@ -284,7 +298,7 @@ const User = () => {
             <Input
               className='dataTable-filter'
               type='text'
-              placeholder='Search'
+              placeholder='Search by Name'
               id='search-input'
               value={searchValue} 
               onChange={(event) => handleSearch(event) }

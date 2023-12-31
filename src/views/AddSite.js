@@ -23,7 +23,7 @@ const ToastContent = ({ message = null }) => (
     )}
   </>
 )
-const AddSite = ({siteModal, setSiteModal, getSiteDetails, editData, setEditData, setSearchValue}) => {
+const AddSite = ({siteModal, setSiteModal, getSiteDetails, editData, setEditData, setSearchValue, setCurrentPage, rowsPerPage}) => {
   const token = getToken()
   const form = useForm()
   const [loading, setLoading] = useState(false)
@@ -49,7 +49,8 @@ const AddSite = ({siteModal, setSiteModal, getSiteDetails, editData, setEditData
       setLoading(false)
       if (response.data.status === 200) {
         toast.success(<ToastContent message={response.data.message} />, { duration:3000 }) 
-        getSiteDetails() 
+        setCurrentPage(0)
+        getSiteDetails(1, rowsPerPage, '') 
         setEditData(null)
         setSiteModal(false)
         setValue('name', '')
@@ -102,7 +103,7 @@ const AddSite = ({siteModal, setSiteModal, getSiteDetails, editData, setEditData
             </div>
             <Row className='mb-1'>
                 <Col>
-                  <Label> Site name</Label>
+                  <Label> Site name <span className='text-danger'>*</span></Label>
                   <Controller
                   control={control}
                   name="name"
@@ -125,7 +126,7 @@ const AddSite = ({siteModal, setSiteModal, getSiteDetails, editData, setEditData
             </Row>
             <Row className='mb-1'>
                 <Col>
-                  <Label> Site Url</Label>
+                  <Label> Site Url <span className='text-danger'>*</span></Label>
                   <Controller
                       name="url"
                       control={control}
@@ -146,7 +147,7 @@ const AddSite = ({siteModal, setSiteModal, getSiteDetails, editData, setEditData
             </Row>
             <Row className='mb-1'>
                 <Col>
-                  <Label>User Name</Label>
+                  <Label>User Name <span className='text-danger'>*</span></Label>
                   <Controller
                   control={control}
                   name="user_name"
@@ -168,7 +169,7 @@ const AddSite = ({siteModal, setSiteModal, getSiteDetails, editData, setEditData
             </Row>
             <Row className='mb-1'>
              <Col>
-             <Label>Password</Label>
+             <Label>Password <span className='text-danger'>*</span></Label>
              <Controller
                   id='password'
                   name='password'
@@ -184,7 +185,7 @@ const AddSite = ({siteModal, setSiteModal, getSiteDetails, editData, setEditData
             </Row>
             <Row className='mb-1'>
                 <Col>
-                  <Label>Select Status</Label>
+                  <Label>Select Status <span className='text-danger'>*</span></Label>
                   <Controller
                   control={control}
                   name="status"

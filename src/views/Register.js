@@ -57,7 +57,7 @@ const RegisterBasic = () => {
         headers: { 
           Authorization: `Token ${register_token}`
         },
-        data: { password: data.password, confirm_password: data.confirmPassword }
+        data: { password: data.password.trim(' '), confirm_password: data.confirmPassword.trim(' ') }
       }
       
       axios(config)
@@ -91,6 +91,13 @@ const RegisterBasic = () => {
     }
   }
 
+  const handleKeyDown = (event) => {
+    console.log('event', event)
+    if (event.key === ' ') {
+      event.preventDefault()
+    }
+  }
+
   return (
     <div className='auth-wrapper auth-basic px-2'>
       <div className='auth-inner my-2'>
@@ -116,7 +123,7 @@ const RegisterBasic = () => {
                     required: 'This field is required'
                   }}
                   render={({ field }) => (
-                    <InputPasswordToggle className='input-group-merge' invalid={errors.password && true} {...field} />
+                    <InputPasswordToggle className='input-group-merge' invalid={errors.password && true} {...field}  onKeyDown={handleKeyDown}/>
                   )}
                 />
                 {errors.password && <p className='text-danger'>{errors.password.message}</p>}
@@ -134,7 +141,7 @@ const RegisterBasic = () => {
                     validate: (value) => value === getValues('password') || 'Passwords do not match'
                   }}
                   render={({ field }) => (
-                    <InputPasswordToggle className='input-group-merge' invalid={errors.confirmPassword && true} {...field} />
+                    <InputPasswordToggle className='input-group-merge' invalid={errors.confirmPassword && true} {...field} onKeyDown={handleKeyDown} />
                   )}
                 />
                  {errors.confirmPassword && <p className='text-danger'>{errors.confirmPassword.message}</p>}
