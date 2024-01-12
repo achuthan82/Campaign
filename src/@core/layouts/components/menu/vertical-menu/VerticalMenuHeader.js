@@ -20,13 +20,20 @@ const VerticalMenuHeader = (props) => {
     setMenuCollapsed,
     setMenuVisibility,
     setGroupOpen,
-    menuHover
+    menuHover,
+    setMenuHover,
+    setLoadedOnce
   } = props
 
   // ** Vars
   const user = getUserData()
  console.log(user)
   // ** Reset open group
+  const expand = () => {
+    setLoadedOnce(false)
+    setMenuCollapsed(true)
+    setMenuHover(false)
+  }
   useEffect(() => {
     if (!menuHover && menuCollapsed) setGroupOpen([])
     console.log(themeConfig.app.appName)
@@ -40,7 +47,7 @@ const VerticalMenuHeader = (props) => {
           size={20}
           data-tour="toggle-icon"
           className="text-primary toggle-icon d-none d-xl-block"
-          onClick={() => setMenuCollapsed(true)}
+          onClick={expand}
         />
       )
     } else {

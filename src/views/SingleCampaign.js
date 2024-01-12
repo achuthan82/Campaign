@@ -1,13 +1,13 @@
 import React, {useEffect, useState} from 'react'
-import { Badge, Card } from 'reactstrap'
+import { Badge, Card, Button } from 'reactstrap'
 import apiConfig from '../configs/apiConfig'
 import axios from 'axios'
 import { getToken } from '@utils'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
 import ComponentSpinner from '@components/spinner/Loading-spinner'
 import moment from "moment"
-
+import { ArrowLeftCircle } from 'react-feather'
 const ToastContent = ({ message = null }) => (
     <>
       {message !== null && (
@@ -24,6 +24,7 @@ const ToastContent = ({ message = null }) => (
   )
 const SingleCampaign = () => {
  const params = useParams()
+ const navigate = useNavigate()
  const [loading, setLoading] = useState(false)
  const [campaignData, setCampaignData] = useState([])
  console.log('params', params)
@@ -55,6 +56,9 @@ const SingleCampaign = () => {
  }, [])
   return (
     <div>
+        <div className='mb-1'>
+          <Button color='primary' className='d-flex align-items-center' onClick={() => navigate('/dashboard')}><ArrowLeftCircle size={18} className='me-50'/><span className=''>Go Back</span></Button>
+        </div>
         {
             campaignData.length > 0 &&        <>
             <Card className='p-2 mb-1'>
@@ -108,12 +112,17 @@ const SingleCampaign = () => {
                   <div className='mb-1'>
                   {campaignData[0].prompt}
                   </div>
-                  <div className='mb-1 py-50 border-bottom'>
-                    <h4>Uploaded Image</h4>
-                  </div>
-                  <div className='mb-1'>
-                  <img src={campaignData[0].url} alt="uploaded image" style={{width:'200px'}}></img>
-                  </div>
+                  { campaignData[0].url !== 'https://dall-e-article-images.s3.amazonaws.com/None' &&
+                      <>
+                      <div className='mb-1 py-50 border-bottom'>
+                        <h4>Uploaded Image</h4>
+                      </div>
+                      <div className='mb-1'>
+                      <img src={campaignData[0].url} alt="uploaded image" style={{width:'200px'}}></img>
+                      </div>
+                      </>
+                  }
+                
               </div>
              </Card>
              {loading && <ComponentSpinner txt="Loading.."/>}

@@ -12,6 +12,9 @@ import moment from "moment"
 import classnames from "classnames"
 import ReactPaginate from "react-paginate"
 import DeleteCampaign from "./DeleteCampaign"
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
+
 
 const ToastContent = ({ message = null }) => (
     <>
@@ -30,6 +33,7 @@ const ToastContent = ({ message = null }) => (
 
 const Dashboard = () => {
   const token = getToken()
+  const MySwal = withReactContent(Swal)
   const navigate = useNavigate()
   const [modalOpen, setModalOpen] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -88,6 +92,83 @@ const Dashboard = () => {
       getCampaign(1, event.target.value)
     }, 1000)
   }
+  const handleConfirmCancel = (item) => {
+    return MySwal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete it!',
+        customClass: {
+          confirmButton: 'btn btn-primary',
+          cancelButton: 'btn btn-danger ml-1'
+        },
+        buttonsStyling: false
+      }).then(function (result) {
+        if (result.value) {
+          const config = {
+              method: 'delete',
+              url: `${apiConfig.api.url}delete_posts`,
+              data:{site_url:item.site_url, complete_delete:true, campaign_id:item.id },
+              headers: { 
+                Authorization: `Token ${token}`
+              }
+            }
+  
+                axios(config)
+                .then(function (response) {
+                    console.log(response.data.status)
+                    if (response.data.status === 200) {
+                        getCampaign(currentPage + 1, searchValue)
+                        toast.success(
+                          <ToastContent message={'Successfully Deleted'} />,
+                          {duration:3000}             
+                        )
+                    } else if (response.data.status === 204) {
+                      getCampaign(currentPage + 1, searchValue)
+                      toast.error(
+                        <ToastContent message={response.data.message} />,
+                        {duration:3000}             
+                      )
+                    } else if (response.data.status === 401) {
+                      toast.error(
+                        <ToastContent message={response.data.message} />,
+                        {duration:3000}             
+                      )
+                    } else {
+                      toast.error(
+                        <ToastContent message={response.data.message} />,
+                        {duration:3000}             
+                      )
+                    }
+                })
+                .catch(error => {
+                  console.log(error)
+                  if (error && error.status === 401) {
+                    toast.error(
+                      <ToastContent message={error.message} />,
+                      { duration:2000 }
+                    )
+                  } else if (error) {
+                    toast.error(
+                      <ToastContent message={error.message} />,
+                      { duration:2000 }
+                    )
+                  } 
+                })
+        } else if (result.dismiss === MySwal.DismissReason.cancel) {
+            MySwal.fire({
+              title: 'Cancelled',
+              text: 'Card Delete Cancelled',
+              icon: 'error',
+              customClass: {
+                confirmButton: 'btn btn-success'
+              }
+            })
+          }
+        })
+}
+
   useEffect(() => {
     getCampaign(1, '')
     // getCategory()
@@ -156,7 +237,8 @@ const Dashboard = () => {
                     </DropdownToggle>
                     <DropdownMenu end>
                         <DropdownItem className='w-100' onClick={() => getEditDetails(item)}><Edit2 size={18} className='me-50' />Edit</DropdownItem>
-                        <DropdownItem className='w-100' onClick={() => openDeleteModal(item.site_url)}><Trash size={18} className='me-50' />Delete</DropdownItem>
+                        <DropdownItem className='w-100' onClick={() => openDeleteModal(item.site_url)}><Trash size={18} className='me-50'/>Delete Posts</DropdownItem>
+                        <DropdownItem className='w-100' onClick={() => handleConfirmCancel(item)}><Trash size={18} className='me-50'/>Delete Campaign</DropdownItem>
                     </DropdownMenu>
                   </UncontrolledDropdown>
                   </Col>

@@ -351,12 +351,11 @@ const Settings = () => {
             </div>
             <div className='d-flex align-items-end justify-content-sm-end mt-sm-0 mt-1'>
             <div className='me-1'>
-            <Input type="text" placeholder="search" value={searchValue} onChange={(event) => handleSearch(event) }></Input>
+            <Input type="text" placeholder="Search by Name" value={searchValue} onChange={(event) => handleSearch(event) }></Input>
             </div>
             <Button color="primary" onClick={addOpen}><span className='me-50'><Plus size={15}/></span><span>Add New </span></Button>
             </div>
             </div>
-         
         <div className='react-dataTable'>
           <DataTable
             pagination

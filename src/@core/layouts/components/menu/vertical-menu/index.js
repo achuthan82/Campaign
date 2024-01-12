@@ -20,13 +20,16 @@ const Sidebar = (props) => {
 
   // ** Menu Hover State
   const [menuHover, setMenuHover] = useState(false)
-
+  const [loadedOnce, setLoadedOnce] = useState(true)
   // ** Ref
   const shadowRef = useRef(null)
 
   // ** Function to handle Mouse Enter
   const onMouseEnter = () => {
-    setMenuHover(true)
+    if (menuCollapsed && loadedOnce) {
+      console.log('enteredd')
+      setMenuHover(true)
+    }
   }
 
   // ** Scroll Menu
@@ -54,7 +57,7 @@ const Sidebar = (props) => {
           }
         )}
         onMouseEnter={onMouseEnter}
-        onMouseLeave={() => setMenuHover(false)}
+        onMouseLeave={() => { setMenuHover(false);  setLoadedOnce(true) }}
       >
         {menu ? (
           menu({ ...props })
@@ -64,6 +67,8 @@ const Sidebar = (props) => {
             <VerticalMenuHeader
               setGroupOpen={setGroupOpen}
               menuHover={menuHover}
+              setMenuHover={setMenuHover}
+              setLoadedOnce={setLoadedOnce}
               {...props}
             />
             {/* Vertical Menu Header Shadow */}

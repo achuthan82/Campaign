@@ -120,7 +120,11 @@ const RegisterBasic = () => {
                   name='password'
                   control={control}
                   rules={{
-                    required: 'This field is required'
+                    required: 'This field is required',
+                    pattern:{
+                      value:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+                      message:'Password must be min 8 characters, and have 1 Special Character, 1 Uppercase, 1 Number and 1 Lowercase'
+                    }
                   }}
                   render={({ field }) => (
                     <InputPasswordToggle className='input-group-merge' invalid={errors.password && true} {...field}  onKeyDown={handleKeyDown}/>

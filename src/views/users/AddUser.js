@@ -155,7 +155,12 @@ const AddUser = ({modalOpen, setModalOpen, getUsers, rowsPerPage, setCurrentPage
                   id='loginEmail'
                   name='loginEmail'
                   control={control}
-                  rules={{ required: "Email is required" }}
+                  rules={{ required: "Email is required",
+                           pattern: {
+                                      value: /.+\..+/,
+                                      message: 'Invalid Email'
+                                    }
+                         }}
                   render={({ field }) => (
                     <Input
                       autoFocus
@@ -166,6 +171,7 @@ const AddUser = ({modalOpen, setModalOpen, getUsers, rowsPerPage, setCurrentPage
                       {...field}
                     />
                   )}
+                     
                 />
                 {errors.loginEmail && <span className='text-danger'>{errors.loginEmail.message}</span>}
 

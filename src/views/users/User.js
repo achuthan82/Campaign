@@ -150,7 +150,7 @@ const User = () => {
           cell: (row, index) => {
             const name = row.first_name.concat(' ').concat(row.last_name)
             return (
-                <span>
+                <span className='d-flex align-items-center'>
                   <span className="me-1">
               <Avatar
                 color={index % 2 === 0 ? "light-secondary" : "light-primary"}
@@ -277,7 +277,7 @@ const User = () => {
           <CardTitle tag='h4'>Users</CardTitle>
         </CardHeader>
             <div className='d-flex justify-content-between flex-wrap vertical-align-middle px-2 mt-50 mb-1'>
-            <div className='d-flex align-items-center'>
+            <div className='d-flex align-items-center mt-1'>
               <Label for='sort-select' className='me-50'>show</Label>
               <Input
                 className='dataTable-select'
@@ -292,7 +292,7 @@ const User = () => {
                 <option value={100}>100</option>
               </Input>
             </div>
-            <div className='d-flex align-items-end justify-content-sm-end mt-sm-0 mt-1'>
+            <div className='d-flex align-items-end justify-content-sm-end flex-wrap mt-sm-0 mt-1'>
             <div className='me-1'>
           
             <Input
@@ -304,7 +304,7 @@ const User = () => {
               onChange={(event) => handleSearch(event) }
             />
             </div>
-            <Button color='primary' onClick={addOpen}><span className='me-50'><Plus size={15}/></span> Add User</Button>
+            <Button color='primary' className='mt-1' onClick={addOpen}><span className='me-50'><Plus size={15}/></span> Add User</Button>
             </div>
             </div>
          

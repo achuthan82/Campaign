@@ -86,7 +86,7 @@ const KeyEditModal = ({keyModal, setKeyModal, aiDetails, getOpenApi}) => {
             </div>
             <Row className='mb-1'>
                 <Col>
-                  <Label>Name</Label>
+                  <Label>Name <span className='text-danger'>*</span></Label>
                   <Controller
                   control={control}
                   name="name"
@@ -108,7 +108,7 @@ const KeyEditModal = ({keyModal, setKeyModal, aiDetails, getOpenApi}) => {
             </Row>
             <Row className='mb-1'>
                 <Col>
-                  <Label>Open AI Key</Label>
+                  <Label>Open AI Key <span className='text-danger'>*</span></Label>
                   <Controller
                   control={control}
                   name="api_key"
@@ -131,7 +131,7 @@ const KeyEditModal = ({keyModal, setKeyModal, aiDetails, getOpenApi}) => {
             </Row>
             <Row className='mb-1'>
                 <Col>
-                  <Label>Select Status</Label>
+                  <Label>Select Status <span className='text-danger'>*</span></Label>
                   <Controller
                   control={control}
                   name="status"

@@ -106,6 +106,9 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
       console.log('data', data)
       const formData = new FormData()
       const categoryData = data.category.map((item) => {
+        return item.value
+      })
+      const categoryName = data.category.map((item) => {
         return item.label
       })
       // formData.append("questions", formatQuestions.length > 0 ? formatQuestions.join('$$') : questions)
@@ -115,7 +118,8 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
       formData.append("post_content", data.content)
       formData.append("settings_id", data.site.value)
       formData.append("post_interval", data.interval.value)
-      formData.append("add_category", categoryData)
+      formData.append("category_id", categoryData)
+      formData.append("add_category", categoryName)
       console.log('files', files)
       files.map((fl, idx) => {
         formData.append(`file${idx + 1}`, fl)
@@ -148,6 +152,7 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
           setSearchValue('')
           setCurrentPage(0)
           getCampaign(1, '')
+          setFiles([])
         } else {
           toast.error(<ToastContent message={response.data.message} />, { duration:3000 })
         }
@@ -248,6 +253,7 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
     setUploadedImage(editData.url)
 
       } else {
+        setUploadedImage('')
         setQuestions('')
         setFormatQuestion([])
       }
