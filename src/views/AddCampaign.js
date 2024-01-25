@@ -27,7 +27,7 @@ const ToastContent = ({ message = null }) => (
     )}
   </>
 )
-const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditData, setSearchValue, setCurrentPage}) => {
+const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditData, setSearchValue, setCurrentPage, rowsPerPage}) => {
     console.log(modalOpen)
     const form = useForm()
     const {
@@ -37,7 +37,7 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
       formState: { errors }
     } = form
     const token = getToken()
-    const intervalOptions = [{label:'15 mins', value:10}, {label:'30 mins', value:20}, {label:'1 hour', value:1}, {label:'12 hours', value:12}, {label:'6 hours', value:6}, {label:'24 hours', value:24}, {label:'72 hours', value:72}]
+    const intervalOptions = [{label:'None', value:0}, {label:'15 mins', value:15}, {label:'30 mins', value:30}, {label:'1 hour', value:1}, {label:'12 hours', value:12}, {label:'6 hours', value:6}, {label:'24 hours', value:24}, {label:'72 hours', value:72}]
     const [files, setFiles] = useState([])
     const [selected, setSelected] = useState([])
     const [siteOptions, setSiteOptions] = useState([])
@@ -151,7 +151,7 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
           setModalOpen(false) 
           setSearchValue('')
           setCurrentPage(0)
-          getCampaign(1, '')
+          getCampaign(1, rowsPerPage, '')
           setFiles([])
         } else {
           toast.error(<ToastContent message={response.data.message} />, { duration:3000 })
@@ -498,11 +498,13 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
                   control={control}
                   name="interval"
                   rules={{ required: "Interval details is required" }}
+                  defaultValue={intervalOptions[0]}
                   render={({ field }) => (
                     <>
                       <Select
                         theme={selectThemeColors}
                         {...field}
+                        defaultValue={intervalOptions[0]}
                         autoFocus
                         options={intervalOptions}
                         id="interval"

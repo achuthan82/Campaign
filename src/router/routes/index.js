@@ -16,6 +16,7 @@ import Dashboard from "../../views/Dashboard"
 import Settings from "../../views/Settings"
 import User from "../../views/users/User"
 import SingleCampaign from "../../views/SingleCampaign"
+import DashboardTable from "../../views/DashboardTable"
 // import OrderSummary from "../../views/OrderSummary"
 // import OrderStates from "../../views/OrderStates"
 // import StateDetails from "../../views/StateDetails"
@@ -100,9 +101,13 @@ const Routes = [
       layout: "blank"
     }
   },
+  // {
+  //   path:'/dashboard',
+  //   element:<Dashboard/>
+  // },
   {
     path:'/dashboard',
-    element:<Dashboard/>
+    element:<DashboardTable/>
   },
   {
     path:'/dashboard/:id',

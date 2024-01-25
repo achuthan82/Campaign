@@ -167,6 +167,7 @@ const AddUser = ({modalOpen, setModalOpen, getUsers, rowsPerPage, setCurrentPage
                       innerRef={field.ref} 
                       type='email'
                       placeholder='john@example.com'
+                      disabled={editData !== null}
                       invalid={errors.loginEmail && true}
                       {...field}
                     />
