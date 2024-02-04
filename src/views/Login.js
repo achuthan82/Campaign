@@ -197,8 +197,13 @@ const Login = () => {
               <Button type='submit' disabled={loginLoading} color='primary' className='' block>
                 {loginLoading && <Spinner size="sm" className='me-50' />} Login
               </Button>
-           
             </Form>
+            <p className='text-center mt-2'>
+              <span className='me-25'>New on our platform?</span>
+              <Link to='/new-user-register'>
+                <span>Create an account</span>
+              </Link>
+            </p>
           </CardBody>
         </Card>
       </div>

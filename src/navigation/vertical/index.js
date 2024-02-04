@@ -19,12 +19,17 @@ export default [
     visible:[1, 2]
   },
   {
+    id: "Tokens",
+    title: "Tokens",
+    icon: <Sliders size={20}/>,
+    navLink: "/token",
+    visible:[1, 2]
+  },
+  {
     id: "Users",
     title: "Users",
     icon: <Users size={20}/>,
     navLink: "/users",
     visible:[1]
-    // disabled: getUserData && getUserData.dt && getUserData.dt.role_id !== 1
-  }
-  
+  } 
 ]

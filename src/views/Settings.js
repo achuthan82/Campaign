@@ -292,7 +292,7 @@ const Settings = () => {
       toast.success(<ToastContent message='Text copied to clipboard'/>, { duration:3000 })  
     }
     useEffect(() => {
-      getSiteDetails('')
+      getSiteDetails(1, 10, '')
       getOpenApi()
     }, [])
   return (

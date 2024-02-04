@@ -17,6 +17,8 @@ import Settings from "../../views/Settings"
 import User from "../../views/users/User"
 import SingleCampaign from "../../views/SingleCampaign"
 import DashboardTable from "../../views/DashboardTable"
+import NewRegister from "../../views/NewRegister"
+import Token from "../../views/Token/Token"
 // import OrderSummary from "../../views/OrderSummary"
 // import OrderStates from "../../views/OrderStates"
 // import StateDetails from "../../views/StateDetails"
@@ -120,6 +122,17 @@ const Routes = [
   {
     path:'/users',
     element:<User/>
+  },
+  {
+    path:'/token',
+    element:<Token/>
+  },
+  {
+    path:'/new-user-register',
+    element:<NewRegister/>,
+    meta: {
+      layout: "blank"
+    }
   }
 
 

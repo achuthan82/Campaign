@@ -214,6 +214,11 @@ const DashboardTable = () => {
         sortable: true
     },
     {
+      name: 'Campaign Title',
+      selector: 'campaign_title',
+      sortable: true
+  },
+    {
         name: 'URL',
         selector: 'site_url',
         sortable: true,
@@ -269,7 +274,7 @@ const DashboardTable = () => {
         name: 'Action',
         allowOverflow: true,
         minWidth: '100px',
-        cell: (row) => {
+        cell: (row, index) => {
          console.log(row)
           return (
             <div className='d-flex align-items-center'>
@@ -277,11 +282,11 @@ const DashboardTable = () => {
               <DropdownToggle className='pr-1' tag='span' style={{cursor:'pointer'}}>
                 <MoreVertical size={15}  />
               </DropdownToggle>
-            <DropdownMenu end>
+            <DropdownMenu end className= {index === 0 && campaignList.length === 1 ? 'notification-dropdown' : ''}>
                         {/* <DropdownItem className='w-100' onClick={() => getEditDetails(row)}><Edit2 size={18} className='me-50' />Edit</DropdownItem> */}
-                        <DropdownItem className='w-100' onClick={() => openDeleteModal(row.site_url)}><Trash size={18} className='me-50'/>Delete Posts</DropdownItem>
-                        <DropdownItem className='w-100' onClick={() => handleConfirmCancel(row)}><Trash size={18} className='me-50'/>Delete Campaign</DropdownItem>
-                        <DropdownItem className='w-100' onClick={() => moveTo(row)}><Eye size={18} className='me-50'/>View Single Page</DropdownItem>
+                        <DropdownItem className='w-100 d-flex align-items-end' onClick={() => openDeleteModal(row.site_url)}><Trash size={15} className='me-50'/><span style={{lineHeight:'0.8'}}>Delete Posts</span></DropdownItem>
+                        <DropdownItem className='w-100 d-flex align-items-end' onClick={() => handleConfirmCancel(row)}><Trash size={15} className='me-50'/><span style={{lineHeight:'0.8'}}>Delete Campaign</span></DropdownItem>
+                        <DropdownItem className='w-100 d-flex align-items-end' onClick={() => moveTo(row)}><Eye size={15} className='me-50'/><span style={{lineHeight:'1.2'}}>View Single Page</span></DropdownItem>
             </DropdownMenu>
             </UncontrolledDropdown>
 
@@ -321,7 +326,7 @@ const DashboardTable = () => {
             <Button color="primary" className="me-1" onClick={() => { setModalOpen(true); setEditData(null) }}><span className="me-50"><Plus size={15}></Plus></span>Add New</Button>
             </div>
             </div>
-      <div className='react-dataTable p-1'>
+      <div className='dashbord-table react-dataTable p-1'>
           <DataTable
             pagination
             paginationServer

@@ -47,7 +47,7 @@ const RegisterBasic = () => {
   localStorage.removeItem('accessToken')
   const data = useParams()
   const register_token = data.token
-  console.log('data', data)
+  console.log('data', data, apiConfig.api.url)
   const onSubmit = data => {
     if (Object.values(data).every(field => field.length > 0)) {
       setLoading(true)

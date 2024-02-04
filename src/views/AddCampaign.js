@@ -115,6 +115,7 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
       formData.append("questions", questions)
       formData.append("prompt", data.prompt)
       formData.append("post_title", data.title)
+      formData.append("campaign_title", data.campaign_title)
       formData.append("post_content", data.content)
       formData.append("settings_id", data.site.value)
       formData.append("post_interval", data.interval.value)
@@ -462,6 +463,28 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
                       id="title"
                       placeholder='Post Title'                      
                       invalid={errors.title}
+                    />
+                  )}
+                />
+              {errors.title && (<p className="text-danger">{errors.title.message}</p>)}
+                </Col>
+            </Row>
+            <Row className='mb-1'>
+                <Col>
+                  <Label>Campaign Title <span className='text-danger'>*</span></Label>
+                  <Controller
+                  control={control}
+                  name="campaign_title"
+                  rules={{ required: "This field is mandatory" }}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      innerRef={field.ref}
+                      autoFocus
+                      type="text"
+                      id="campaign_title"
+                      placeholder='Campaign Title'                      
+                      invalid={errors.campaign_title}
                     />
                   )}
                 />
