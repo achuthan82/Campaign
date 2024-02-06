@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import { Plus, Edit, Trash, ChevronDown } from 'react-feather'
-import { Button, Card, CardHeader, Label, Input, Badge, CardTitle } from 'reactstrap'
+import { Button, Card, CardHeader, Label, Input, Badge, CardTitle, Check, X } from 'reactstrap'
 import AddUser from './AddUser'
 import apiConfig from '../../configs/apiConfig'
 import axios from 'axios'
@@ -26,6 +26,18 @@ const ToastContent = ({ message = null }) => (
       )}
     </>
   )
+const CustomLabel = ({ htmlFor }) => {
+    return (
+      <Label className='form-check-label' htmlFor={htmlFor}>
+        <span className='switch-icon-left'>
+          <Check size={14} />
+        </span>
+        <span className='switch-icon-right'>
+          <X size={14} />
+        </span>
+      </Label>
+    )
+  }
 const User = () => {
     const token = getToken()
     const MySwal = withReactContent(Swal)
@@ -198,6 +210,7 @@ const User = () => {
           }
           // minWidth: '152px'
       },
+    
       {
           name: 'Action',
           allowOverflow: true,
@@ -211,7 +224,7 @@ const User = () => {
               </div>
             )
           }
-        }
+      }
 
   ]
     const handlePagination = (page) => {
