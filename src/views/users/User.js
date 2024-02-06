@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react'
-import { Plus, Edit, Trash, ChevronDown } from 'react-feather'
-import { Button, Card, CardHeader, Label, Input, Badge, CardTitle, Check, X } from 'reactstrap'
+import { Plus, Edit, Trash, ChevronDown, Check, X } from 'react-feather'
+import { Button, Card, CardHeader, Label, Input, Badge, CardTitle } from 'reactstrap'
 import AddUser from './AddUser'
 import apiConfig from '../../configs/apiConfig'
 import axios from 'axios'
@@ -151,6 +151,25 @@ const User = () => {
         }
       })
     }
+    const handleStatus = (row) => {
+      const config = {
+        method: 'put',
+        url: `${apiConfig.api.url}user/edit_other_user_info/${row.id}`,
+        data: { admin_status : !row.admin_status, role_id : 1}
+    }
+    axios(config).then((response) => {
+      if (response.data.status === 200) {
+          toast.success(<ToastContent message={response.data.message} />, { duration:3000 }) 
+          getUsers(currentPage + 1, rowsPerPage)
+      } else {
+          toast.error(<ToastContent message={response.data.message} />, { duration:3000 })  
+      }
+  }).catch(() => {
+      toast.error(<ToastContent message='Network Error' />, { duration:3000 })  
+
+  })
+
+  }
     useEffect(() => {
       console.log('users', userList)
     }, [userList])
@@ -159,6 +178,7 @@ const User = () => {
           name: 'Name',
           selector: row => row.first_name,
           sortable: true,
+          minWidth:'200px',
           cell: (row, index) => {
             const name = row.first_name.concat(' ').concat(row.last_name)
             return (
@@ -210,6 +230,24 @@ const User = () => {
           }
           // minWidth: '152px'
       },
+      {
+        name: 'Activate/Inactivate User',
+        selector: 'admin_status',
+        // minWidth: '130px',
+        cell: row => {
+            return (
+            <>
+            {console.log(row)}
+                <div className='d-flex flex-column'>
+                    <div className='form-switch form-check-success'>
+                    <Input type='switch' checked = {row.admin_status} onClick={() => handleStatus(row)} id={`switch_${row.id}`} name={`switch_${row.id}`} />
+                    <CustomLabel htmlFor={`switch_${row.id}`} />
+                    </div>
+                </div>
+            </>
+            )
+          }
+       },
     
       {
           name: 'Action',
