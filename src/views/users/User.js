@@ -217,9 +217,10 @@ const User = () => {
         // minWidth: '152px'
     },
       {
-          name: 'Status',
+          name: 'Campaign Permissions',
           selector: 'status',
           sortable: true,
+          minWidth:'210px',
           cell: row => {
               console.log('row', row)
               return (
@@ -231,9 +232,9 @@ const User = () => {
           // minWidth: '152px'
       },
       {
-        name: 'Activate/Inactivate User',
+        name: 'Account Status',
         selector: 'admin_status',
-        // minWidth: '130px',
+        minWidth:'170px',
         cell: row => {
             return (
             <>
