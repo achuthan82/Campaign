@@ -155,7 +155,7 @@ const User = () => {
       const config = {
         method: 'put',
         url: `${apiConfig.api.url}user/edit_other_user_info/${row.id}`,
-        data: { admin_status : !row.admin_status, role_id : 1}
+        data: { admin_status : !row.admin_status, role_id : row.role_id}
     }
     axios(config).then((response) => {
       if (response.data.status === 200) {

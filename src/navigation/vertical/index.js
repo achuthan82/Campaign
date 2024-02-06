@@ -1,14 +1,22 @@
-import { Mail, Home, Sliders, Briefcase, Search, List, UserCheck, Gift, Bell, ShoppingBag, AlignJustify, AlignLeft, Settings, Users} from "react-feather"
+import { Mail, Home, Sliders, Briefcase, Search, List, UserCheck, Gift, Bell, ShoppingBag, AlignJustify, AlignLeft, Settings, Users, Type, Volume} from "react-feather"
 // import { getUserData} from '@utils'
-
+//Visibility---      1-Admin  2-Agent
 
 export default [
   {
-    id: "dashboard",
+    id: "Dashboard",
     title: "Dashboard",
     icon: <Home size={20} />,
     // visible: ["Admin", "Marketplace Member", "Agent"],
     navLink: "/dashboard",
+    visible:[1, 2]
+  },
+  {
+    id: "Campaign",
+    title: "Campaign",
+    icon: <Volume size={20} />,
+    // visible: ["Admin", "Marketplace Member", "Agent"],
+    navLink: "/campaign",
     visible:[1, 2]
   },
   {
@@ -21,7 +29,7 @@ export default [
   {
     id: "Tokens",
     title: "Tokens",
-    icon: <Sliders size={20}/>,
+    icon: <Type size={20}/>,
     navLink: "/token",
     visible:[1, 2]
   },

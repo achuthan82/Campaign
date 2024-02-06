@@ -19,6 +19,7 @@ import SingleCampaign from "../../views/SingleCampaign"
 import DashboardTable from "../../views/DashboardTable"
 import NewRegister from "../../views/NewRegister"
 import Token from "../../views/Token/Token"
+import CampaignDashboard from "../../views/CampaignDashboard"
 // import OrderSummary from "../../views/OrderSummary"
 // import OrderStates from "../../views/OrderStates"
 // import StateDetails from "../../views/StateDetails"
@@ -108,11 +109,11 @@ const Routes = [
   //   element:<Dashboard/>
   // },
   {
-    path:'/dashboard',
+    path:'/campaign',
     element:<DashboardTable/>
   },
   {
-    path:'/dashboard/:id',
+    path:'/campaign/:id',
     element:<SingleCampaign/>
   },
   {
@@ -126,6 +127,10 @@ const Routes = [
   {
     path:'/token',
     element:<Token/>
+  },
+  {
+    path:'/dashboard',
+    element:<CampaignDashboard/>
   },
   {
     path:'/new-user-register',

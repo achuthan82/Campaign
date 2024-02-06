@@ -42,7 +42,8 @@ const AddUser = ({modalOpen, setModalOpen, getUsers, rowsPerPage, setCurrentPage
         data: { email: data.loginEmail,
             first_name: data.first_name, 
             last_name:data.last_name, 
-            role_id:data.role.value
+            role_id:data.role.value,
+            admin_status: true
         }
       }
     axios(config).then((response) => {
