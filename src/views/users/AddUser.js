@@ -88,6 +88,12 @@ const AddUser = ({modalOpen, setModalOpen, getUsers, rowsPerPage, setCurrentPage
       setValue('first_name', editData.first_name)
       setValue('last_name', editData.last_name)
       setValue('role', roleOptions[roleId])
+     } else {
+       
+        setValue('loginEmail', '')
+        setValue('first_name', '')
+        setValue('last_name', '')
+        setValue('role', null)
      }
   }, [modalOpen])
   return (

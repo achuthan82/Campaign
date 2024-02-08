@@ -57,7 +57,7 @@ const SingleCampaign = () => {
   return (
     <div>
         <div className='mb-1'>
-          <Button color='primary' className='d-flex align-items-center' onClick={() => navigate('/dashboard')}><ArrowLeftCircle size={18} className='me-50'/><span className=''>Go Back</span></Button>
+          <Button color='primary' className='d-flex align-items-center' onClick={() => navigate('/campaign')}><ArrowLeftCircle size={18} className='me-50'/><span className=''>Go Back</span></Button>
         </div>
         {
             campaignData.length > 0 &&        <>
@@ -72,7 +72,7 @@ const SingleCampaign = () => {
               </div>
               <div className='d-flex flex-wrap justify-content-between align-items-center'>
               <div>
-                 <h4 className='mb-1'> Categories</h4>
+                 <h4 className='mb-1'></h4>
                  {campaignData[0].category_info.map((item, index) => {
                     return (
                         <Badge color='primary' className='me-50' key={index}>{item.category_name}</Badge>

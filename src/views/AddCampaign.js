@@ -257,6 +257,7 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
         setUploadedImage('')
         setQuestions('')
         setFormatQuestion([])
+        setValue('campaign_title', '')
       }
     }
     }, [modalOpen])
@@ -488,7 +489,7 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
                     />
                   )}
                 />
-              {errors.title && (<p className="text-danger">{errors.title.message}</p>)}
+              {errors.campaign_title && (<p className="text-danger">{errors.campaign_title.message}</p>)}
                 </Col>
             </Row>
             <Row className='mb-1'>

@@ -21,7 +21,7 @@ const ToastContent = ({ message = null }) => (
       )}
     </>
   )
-const DeleteCampaign = ({deleteModal, deleteUrl, setDeleteModal}) => {
+const DeleteCampaign = ({deleteModal, deleteUrl, setDeleteModal, deleteId}) => {
     const token = getToken()
     const form = useForm()
     const [loading, setLoading] = useState(false)
@@ -30,7 +30,7 @@ const DeleteCampaign = ({deleteModal, deleteUrl, setDeleteModal}) => {
     const {
       control,
       handleSubmit,
-    //   setValue,
+      setValue,
       formState: { errors }
     } = form
     // const postOptions = [{label:'Active', value:1}, {label:'Inactive', value:2}]
@@ -65,8 +65,8 @@ const DeleteCampaign = ({deleteModal, deleteUrl, setDeleteModal}) => {
         setOptionsLoading(true)
         const config = {
             method: 'post',
-            url: `${apiConfig.api.url}list_posts`,
-            data:{site_url:deleteUrl },
+            url: `${apiConfig.api.url}list_scheduled_posts`,
+            data:{site_url:deleteUrl, camp_id:deleteId},
             headers: { 
               Authorization: `Token ${token}`
             }
@@ -87,9 +87,14 @@ const DeleteCampaign = ({deleteModal, deleteUrl, setDeleteModal}) => {
     }
     useEffect(() => {
      if (deleteModal) {
+      setValue('post', null)
       getPosts()
      }
     }, [deleteModal])
+    const close = () => {
+      setValue('post', null)
+      setDeleteModal(false)
+    }
   return (
     <div>
       <Modal isOpen={deleteModal} size="lg" toggle={close}>
@@ -98,7 +103,7 @@ const DeleteCampaign = ({deleteModal, deleteUrl, setDeleteModal}) => {
         <ModalBody className='p-3'>
             <div className='mb-1'>
             <div className='mb-1 d-flex justify-content-center'>
-                <h2>Delete Posts</h2>
+                <h2>Delete Scheduled Posts</h2>
             </div>
             </div>
             <Row className='mb-1'>
@@ -136,7 +141,7 @@ const DeleteCampaign = ({deleteModal, deleteUrl, setDeleteModal}) => {
         </ModalBody>
         <ModalFooter className='d-flex justify-content-center'>
             <Button color='primary' type="submit" disabled={loading}>{loading && <Spinner size="sm" className='me-50' />} Submit</Button>
-            <Button onClick={() => setDeleteModal(false)}>Cancel</Button>
+            <Button onClick={close}>Cancel</Button>
         </ModalFooter>
         </Form>
       </Modal> 

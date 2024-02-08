@@ -43,7 +43,7 @@ const DashboardTable = () => {
   const [deleteModal, setDeleteModal] = useState(false)
   const [deleteUrl, setDeleteUrl] = useState('')
   const [searchValue, setSearchValue] = useState('')
-
+  const [deleteId, setDeleteId] = useState('')
   const getCampaign = (page, per_page, val) => {
     setLoading(true)
     const config = {
@@ -76,9 +76,10 @@ const DashboardTable = () => {
     setCurrentPage(page.selected)
     getCampaign(page.selected + 1, rowsPerPage,  searchValue)
   }
-  const openDeleteModal = (url) => {
+  const openDeleteModal = (row) => {
     setDeleteModal(true)
-    setDeleteUrl(url)
+    setDeleteUrl(row.site_url)
+    setDeleteId(row.id)
   }
   const handlePerPage = (event) => {
     setCurrentPage(0)
@@ -96,7 +97,7 @@ const DashboardTable = () => {
   }
 
   const moveTo = (item) => {
-    navigate(`/dashboard/${item.id}`)
+    navigate(`/campaign/${item.id}`)
   }
   const CustomPagination = () => (
     <ReactPaginate
@@ -216,7 +217,8 @@ const DashboardTable = () => {
     {
       name: 'Campaign Title',
       selector: 'campaign_title',
-      sortable: true
+      sortable: true,
+      minWidth:'160px'
   },
     {
         name: 'URL',
@@ -234,6 +236,7 @@ const DashboardTable = () => {
     {
         name: 'Created Date',
         selector: 'created_at',
+        minWidth:'170px',
         sortable: true,
         cell: row => {
           console.log('row', row)
@@ -247,6 +250,7 @@ const DashboardTable = () => {
     {
       name: 'Post Count',
       selector: 'post_count',
+      minWidth:'200px',
       sortable: true,
       cell: row => {
         console.log('row', row)
@@ -284,7 +288,7 @@ const DashboardTable = () => {
               </DropdownToggle>
             <DropdownMenu end className= {index === 0 && campaignList.length === 1 ? 'notification-dropdown' : ''}>
                         {/* <DropdownItem className='w-100' onClick={() => getEditDetails(row)}><Edit2 size={18} className='me-50' />Edit</DropdownItem> */}
-                        <DropdownItem className='w-100 d-flex align-items-end' onClick={() => openDeleteModal(row.site_url)}><Trash size={15} className='me-50'/><span style={{lineHeight:'0.8'}}>Delete Posts</span></DropdownItem>
+                        <DropdownItem className='w-100 d-flex align-items-end' onClick={() => openDeleteModal(row)}><Trash size={15} className='me-50'/><span style={{lineHeight:'0.8'}}>Delete Scheduled Posts</span></DropdownItem>
                         <DropdownItem className='w-100 d-flex align-items-end' onClick={() => handleConfirmCancel(row)}><Trash size={15} className='me-50'/><span style={{lineHeight:'0.8'}}>Delete Campaign</span></DropdownItem>
                         <DropdownItem className='w-100 d-flex align-items-end' onClick={() => moveTo(row)}><Eye size={15} className='me-50'/><span style={{lineHeight:'1.2'}}>View Single Page</span></DropdownItem>
             </DropdownMenu>
@@ -347,7 +351,7 @@ const DashboardTable = () => {
         </div>
       </Card>
       <AddCampaign modalOpen={modalOpen} setModalOpen={setModalOpen} editData={editData} getCampaign={getCampaign} setEditData={setEditData} searchValue={searchValue} setSearchValue={setSearchValue} setCurrentPage={setCurrentPage}/>
-      <DeleteCampaign deleteModal={deleteModal} setDeleteModal={setDeleteModal} deleteUrl={deleteUrl} setDeleteUrl={setDeleteUrl}></DeleteCampaign>
+      <DeleteCampaign deleteModal={deleteModal} setDeleteModal={setDeleteModal} deleteUrl={deleteUrl} setDeleteUrl={setDeleteUrl} deleteId={deleteId}></DeleteCampaign>
 
     </div>
   )
