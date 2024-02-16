@@ -9,11 +9,12 @@ import apiConfig from '../configs/apiConfig'
 import axios from 'axios'
 import { getToken } from '@utils'
 import { Card, Badge, CardHeader, CardTitle, Input, Label, Button, UncontrolledDropdown, DropdownItem, DropdownMenu, DropdownToggle} from "reactstrap"
-import { ChevronDown, Plus,  MoreHorizontal, MoreVertical, ArrowRightCircle, Edit2, Grid, List, Trash, Eye, RefreshCw } from "react-feather"
+import { ChevronDown, Plus,  MoreHorizontal, MoreVertical, ArrowRightCircle, Edit2, Grid, List, Trash, Eye, RefreshCw, Check, X, PauseCircle, PlayCircle } from "react-feather"
 import ReactPaginate from "react-paginate"
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import { useNavigate } from "react-router-dom"
+import ComponentSpinner from '@components/spinner/Loading-spinner'
 
 const ToastContent = ({ message = null }) => (
     <>
@@ -29,6 +30,18 @@ const ToastContent = ({ message = null }) => (
       )}
     </>
   )
+const CustomLabel = ({ htmlFor }) => {
+    return (
+      <Label className='form-check-label' htmlFor={htmlFor}>
+        <span className='switch-icon-left'>
+          <Check size={14} />
+        </span>
+        <span className='switch-icon-right'>
+          <X size={14} />
+        </span>
+      </Label>
+    )
+  }
 const DashboardTable = () => {
   const navigate = useNavigate()
   const token = getToken()
@@ -44,6 +57,7 @@ const DashboardTable = () => {
   const [deleteUrl, setDeleteUrl] = useState('')
   const [searchValue, setSearchValue] = useState('')
   const [deleteId, setDeleteId] = useState('')
+  const [pauseLoad, setPauseLoad] = useState(false)
   const getCampaign = (page, per_page, val) => {
     setLoading(true)
     const config = {
@@ -128,10 +142,31 @@ const DashboardTable = () => {
     getCampaign(1, 10, '')
     // getCategory()
   }, [])
-//   const getEditDetails = (item) => {
-//     setEditData(item)
-//     setModalOpen(true)
-//  }
+  const handleStatus = (row) => {
+    console.log('row-status', row)
+    console.log('pause_status', row.pause_status)
+    setPauseLoad(true)
+    const config = {
+      method: 'post',
+      url: `${apiConfig.api.url}campaign_status`,
+      data: {pause_status: !row.pause_status, campaign_title: row.campaign_title, category_id:row.category_id, category_name:row.category_name, id: row.id, post_content: row.post_content, post_interval: row.post_interval, post_title: row.post_title, prompt: row.prompt, questions:row.questions, site_url:row.site_url, stored_questions:row.stored_questions}
+  }
+  axios(config).then((response) => {
+    setPauseLoad(false)
+    if (response.data.status === 200) {
+        toast.success(<ToastContent message={response.data.message} />, { duration:3000 }) 
+        getCampaign(currentPage + 1, rowsPerPage, searchValue)
+    } else {
+        toast.error(<ToastContent message={response.data.message} />, { duration:3000 })  
+    }
+}).catch(() => {
+    setPauseLoad(false)
+    toast.error(<ToastContent message='Network Error' />, { duration:3000 })  
+
+})
+
+}
+
  const handleConfirmCancel = (item) => {
     return MySwal.fire({
         title: 'Are you sure?',
@@ -159,13 +194,13 @@ const DashboardTable = () => {
                 .then(function (response) {
                     console.log(response.data.status)
                     if (response.data.status === 200) {
-                        getCampaign(currentPage + 1, searchValue)
+                      getCampaign(currentPage + 1, rowsPerPage, searchValue)
                         toast.success(
                           <ToastContent message={'Successfully Deleted'} />,
                           {duration:3000}             
                         )
                     } else if (response.data.status === 204) {
-                      getCampaign(currentPage + 1, searchValue)
+                      getCampaign(currentPage + 1, rowsPerPage, searchValue)
                       toast.error(
                         <ToastContent message={response.data.message} />,
                         {duration:3000}             
@@ -248,9 +283,9 @@ const DashboardTable = () => {
       }
     },
     {
-      name: 'Post Count',
+      name: 'Posts',
       selector: 'post_count',
-      minWidth:'200px',
+      maxWidth:'1px',
       sortable: true,
       cell: row => {
         console.log('row', row)
@@ -260,11 +295,12 @@ const DashboardTable = () => {
             </span>
         )
     }
-  },
+    },
     {
         name: 'Status',
         selector: 'status',
         sortable: true,
+        maxWidth:'1px',
         cell: row => {
             console.log('row', row)
             return (
@@ -275,9 +311,29 @@ const DashboardTable = () => {
         }
     },
     {
+      name: 'Pause/Resume',
+      selector: 'admin_status',
+      // minWidth:'170px',
+      cell: row => {
+          return (
+          <>
+          {console.log(row)}
+          <span title="Click here to Pause/Resume" onClick={() => handleStatus(row)} style={{cursor:'pointer'}}>{row.pause_status ? <PlayCircle className="pause-icon"/> : <PauseCircle className="pause-icon"/>}</span>
+              {/* <div className='d-flex flex)-column'>
+                  <div className='form-switch form-check-success'>
+                  <Input type='switch' checked = {row.pause_status} onClick={() => handleStatus(row)} id={`switch_${row.id}`} name={`switch_${row.id}`} />
+                  <CustomLabel htmlFor={`switch_${row.id}`} />
+                  </div>
+              </div> */}
+          </>
+          )
+        }
+     },
+    {
         name: 'Action',
         allowOverflow: true,
-        minWidth: '100px',
+        maxWidth:'1px',
+        // minWidth: '100px',
         cell: (row, index) => {
          console.log(row)
           return (
@@ -350,8 +406,9 @@ const DashboardTable = () => {
           />
         </div>
       </Card>
-      <AddCampaign modalOpen={modalOpen} setModalOpen={setModalOpen} editData={editData} getCampaign={getCampaign} setEditData={setEditData} searchValue={searchValue} setSearchValue={setSearchValue} setCurrentPage={setCurrentPage}/>
+      <AddCampaign modalOpen={modalOpen} setModalOpen={setModalOpen} editData={editData} getCampaign={getCampaign} setEditData={setEditData} searchValue={searchValue} setSearchValue={setSearchValue} setCurrentPage={setCurrentPage} rowsPerPage={rowsPerPage}/>
       <DeleteCampaign deleteModal={deleteModal} setDeleteModal={setDeleteModal} deleteUrl={deleteUrl} setDeleteUrl={setDeleteUrl} deleteId={deleteId}></DeleteCampaign>
+      {pauseLoad && <ComponentSpinner txt="Please Wait..."/>}
 
     </div>
   )

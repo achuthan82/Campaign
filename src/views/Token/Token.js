@@ -9,6 +9,7 @@ import TokenModal from './TokenModal'
 import ComponentSpinner from '@components/spinner/Loading-spinner'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
+// import moment from "moment"
 
 const ToastContent = ({ message = null }) => (
   <>
@@ -158,7 +159,9 @@ const Token = () => {
               <Row className={`align-items-top`}>
                 <Col xs={10}>
                   <h5>{item.token_name}</h5>
-                  <p>{item.token_code}</p>
+                  <p><span style={{color:'#5e5873'}}>Created:</span> {item.created_at}</p>
+                  <p><span style={{color:'#5e5873'}}>Updated:</span> {item.updated_at}</p>
+
                 </Col>
                 <Col className="d-flex justify-content-end" xs={2}>
                   <UncontrolledDropdown>
@@ -170,6 +173,13 @@ const Token = () => {
                       <DropdownItem className='w-100' onClick={() => handleConfirmCancel(item)}><Trash size={18} className='me-50'/><span style={{lineHeight:'0.8'}}>Delete</span></DropdownItem>
                   </DropdownMenu>
                 </UncontrolledDropdown>
+                </Col>
+              </Row>
+              <Row>
+                <Col>
+                  <p className="truncated-paragraph">
+                   {item.token_code}
+                  </p>
                 </Col>
               </Row>
               <Row>

@@ -43,7 +43,11 @@ const KeyEditModal = ({keyModal, setKeyModal, aiDetails, getOpenApi}) => {
      setValue('name', aiDetails.name)
      setValue('api_key', aiDetails.openai_api_key)
      setValue('status', statusOptions[statusId])
-    } 
+    } else {
+      setValue('name', '')
+      setValue('api_key', '')
+      setValue('status', null)
+    }
  }, [keyModal])
  
   const addOrEditKey = (details) => {

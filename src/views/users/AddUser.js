@@ -5,7 +5,6 @@ import { useForm, Controller } from "react-hook-form"
 import apiConfig from '../../configs/apiConfig'
 import axios from 'axios'
 import { toast } from 'react-hot-toast'
-
 const ToastContent = ({ message = null }) => (
     <>
       {message !== null && (

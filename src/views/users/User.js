@@ -76,7 +76,6 @@ const User = () => {
         } else {
           setUserList([])
           toast.error(<ToastContent message={response.data.message} />, { duration:3000 })  
-
         }
       }).catch((error) => {
         setPending(false)
