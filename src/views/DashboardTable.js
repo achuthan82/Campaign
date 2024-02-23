@@ -142,6 +142,10 @@ const DashboardTable = () => {
     getCampaign(1, 10, '')
     // getCategory()
   }, [])
+  useEffect(() => {
+    console.log("entered")
+    window.scrollTo(0, 0)
+  }, [modalOpen])
   const handleStatus = (row) => {
     console.log('row-status', row)
     console.log('pause_status', row.pause_status)
@@ -269,20 +273,6 @@ const DashboardTable = () => {
       }
     },
     {
-        name: 'Created Date',
-        selector: 'created_at',
-        minWidth:'170px',
-        sortable: true,
-        cell: row => {
-          console.log('row', row)
-          return (
-              <span>
-                {moment(row.created_at, "ddd, DD MMM YYYY HH:mm:ss [GMT]").format('DD-MM-YYYY hh:mm A')}
-              </span>
-          )
-      }
-    },
-    {
       name: 'Posts',
       selector: 'post_count',
       maxWidth:'1px',
@@ -295,6 +285,20 @@ const DashboardTable = () => {
             </span>
         )
     }
+    },
+    {
+        name: 'Created Date',
+        selector: 'created_at',
+        minWidth:'170px',
+        sortable: true,
+        cell: row => {
+          console.log('row', row)
+          return (
+              <span>
+                {moment(row.created_at, "ddd, DD MMM YYYY HH:mm:ss [GMT]").format('DD-MM-YYYY hh:mm A')}
+              </span>
+          )
+      }
     },
     {
         name: 'Status',
@@ -381,9 +385,9 @@ const DashboardTable = () => {
             </div>
             <div className='d-flex align-items-end justify-content-sm-end mt-sm-0 mt-1'>
             <div className='me-1'>
-            <Input type="text" placeholder="search by name" value={searchValue} onChange={(event) => handleSearch(event) }></Input>
+            <Input type="text" placeholder="search by title" value={searchValue} onChange={(event) => handleSearch(event) }></Input>
             </div>
-            <Button color="primary" className="me-1" onClick={() => { setModalOpen(true); setEditData(null) }}><span className="me-50"><Plus size={15}></Plus></span>Add New</Button>
+            <Button color="primary" className="me-1" onClick={() => { window.scrollTo(0, 0); setModalOpen(true); setEditData(null) }}><span className="me-50"><Plus size={15}></Plus></span>Add New</Button>
             </div>
             </div>
       <div className='dashbord-table react-dataTable p-1'>

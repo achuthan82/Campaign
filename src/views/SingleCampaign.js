@@ -27,6 +27,7 @@ const SingleCampaign = () => {
  const navigate = useNavigate()
  const [loading, setLoading] = useState(false)
  const [campaignData, setCampaignData] = useState([])
+ const [question, setQuestion] = useState([])
  console.log('params', params)
  const token = getToken()
  const getCampaignDetails = () => {
@@ -43,6 +44,7 @@ const SingleCampaign = () => {
         setLoading(false)
         if (response.data.status === 200) {
             setCampaignData(response.data.data)
+            setQuestion(response.data.data[0].questions.split('\r\n'))
         } else {
             toast.error(<ToastContent message={response.data.message} />, { duration:3000 })  
         }
@@ -54,6 +56,9 @@ const SingleCampaign = () => {
  useEffect(() => {
     getCampaignDetails()
  }, [])
+ useEffect(() => {
+  console.log('questionArr', question)
+}, [question])
   return (
     <div>
         <div className='mb-1'>
@@ -98,7 +103,15 @@ const SingleCampaign = () => {
                     <h4>Questions</h4>
                   </div>
                   <div className='mb-1'>
-                  {campaignData[0].questions}
+                    <ul>
+                  {
+                    question.length > 0 && question.map((item) => {
+                        return (
+                          <li>{item}</li>
+                        )
+                    })
+                  }
+                  </ul>
                   </div>
                   <div className='mb-1 py-50 border-bottom'>
                     <h4>Post Content</h4>

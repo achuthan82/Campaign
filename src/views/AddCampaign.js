@@ -108,9 +108,11 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
       const categoryData = data.category.map((item) => {
         return item.value
       })
-      const categoryName = data.category.map((item) => {
-        return item.label
-      })
+      const categoryNameFilter = data.category.filter((item) => item.__isNew__)
+      // console.log(categoryNameFilter)
+      const categoryName = categoryNameFilter.length > 0 ? categoryNameFilter.map((item) => {
+        return item.value
+      }) : ''
       // formData.append("questions", formatQuestions.length > 0 ? formatQuestions.join('$$') : questions)
       formData.append("questions", questions)
       formData.append("prompt", data.prompt)
@@ -173,6 +175,7 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
       }
       axios(config).then((response) => {
         console.log('response', response)
+
         setSiteLoading(false)
         if (response.data.status === 200) {
           const formatData = response.data.data.map((item) => {
@@ -220,6 +223,9 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
     useEffect(() => {
       if (modalOpen) {
       getSiteDetails()
+      setTimeout(() => {
+        window.scrollTo(0, 0)
+      }, 3000)
       // getCategoryDetails()
       if (editData !== null) {
         console.log('editData', editData)
@@ -244,7 +250,6 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
         }
         const blob = new Blob([''], { type: fileDetails.type })
 
-    // Create a File object with the Blob and file details
     const customFile = new File([blob], fileDetails.name, {
       lastModified: fileDetails.lastModified,
       type: fileDetails.type
@@ -318,9 +323,10 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
       console.log('site-event', event)
       setSiteUrl(event.url)
     }
+
   return (
     <div>
-      <Modal isOpen={modalOpen} size="lg" toggle={close}>
+      <Modal isOpen={modalOpen} size="lg" toggle={close} >
         <ModalHeader toggle={close}> </ModalHeader>
         <Form onSubmit={handleSubmit(addOrEditCampaign)}>
         <ModalBody className='p-3'>
@@ -583,7 +589,6 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
         <ModalFooter className='d-flex justify-content-center'>
             <Button color='primary' type="submit" disabled={loading}>{loading && <Spinner size="sm" className='me-50' />} Submit</Button>
             <Button onClick={close}>Cancel</Button>
-
         </ModalFooter>
         </Form>
       </Modal>
