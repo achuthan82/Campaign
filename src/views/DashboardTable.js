@@ -56,8 +56,9 @@ const DashboardTable = () => {
   const [deleteModal, setDeleteModal] = useState(false)
   const [deleteUrl, setDeleteUrl] = useState('')
   const [searchValue, setSearchValue] = useState('')
-  const [deleteId, setDeleteId] = useState('')
+  // const [deleteId, setDeleteId] = useState('')
   const [pauseLoad, setPauseLoad] = useState(false)
+  // setDeleteId(null)
   const getCampaign = (page, per_page, val) => {
     setLoading(true)
     const config = {
@@ -90,11 +91,11 @@ const DashboardTable = () => {
     setCurrentPage(page.selected)
     getCampaign(page.selected + 1, rowsPerPage,  searchValue)
   }
-  const openDeleteModal = (row) => {
-    setDeleteModal(true)
-    setDeleteUrl(row.site_url)
-    setDeleteId(row.id)
-  }
+  // const openDeleteModal = (row) => {
+  //   setDeleteModal(true)
+  //   setDeleteUrl(row.site_url)
+  //   setDeleteId(row.id)
+  // }
   const handlePerPage = (event) => {
     setCurrentPage(0)
     setRowsPerPage(parseInt(event.target.value))
@@ -146,32 +147,7 @@ const DashboardTable = () => {
     console.log("entered")
     window.scrollTo(0, 0)
   }, [modalOpen])
-  const handleStatus = (row) => {
-    console.log('row-status', row)
-    console.log('pause_status', row.pause_status)
-    setPauseLoad(true)
-    const config = {
-      method: 'post',
-      url: `${apiConfig.api.url}campaign_status`,
-      data: {pause_status: !row.pause_status, campaign_title: row.campaign_title, category_id:row.category_id, category_name:row.category_name, id: row.id, post_content: row.post_content, post_interval: row.post_interval, post_title: row.post_title, prompt: row.prompt, questions:row.questions, site_url:row.site_url, stored_questions:row.stored_questions}
-  }
-  axios(config).then((response) => {
-    setPauseLoad(false)
-    if (response.data.status === 200) {
-        toast.success(<ToastContent message={response.data.message} />, { duration:3000 }) 
-        getCampaign(currentPage + 1, rowsPerPage, searchValue)
-    } else {
-        toast.error(<ToastContent message={response.data.message} />, { duration:3000 })  
-    }
-}).catch(() => {
-    setPauseLoad(false)
-    toast.error(<ToastContent message='Network Error' />, { duration:3000 })  
-
-})
-
-}
-
- const handleConfirmCancel = (item) => {
+  const handleConfirmCancel = (item) => {
     return MySwal.fire({
         title: 'Are you sure?',
         text: "You won't be able to revert this!",
@@ -247,6 +223,36 @@ const DashboardTable = () => {
           }
         })
 }
+  const handleStatus = (row, text) => {
+    console.log('row-status', row)
+    console.log('pause_status', row.pause_status)
+    setPauseLoad(true)
+    const config = {
+      method: 'post',
+      url: `${apiConfig.api.url}campaign_status`,
+      data: {pause_status: !row.pause_status, campaign_title: row.campaign_title, category_id:row.category_id, category_name:row.category_name, id: row.id, post_content: row.post_content, post_interval: row.post_interval, post_title: row.post_title, prompt: row.prompt, questions:row.questions, site_url:row.site_url, stored_questions:row.stored_questions}
+  }
+  axios(config).then((response) => {
+    setPauseLoad(false)
+    if (response.data.status === 200) {
+        if (text !== 'delete') {
+        toast.success(<ToastContent message={response.data.message} />, { duration:3000 }) 
+        getCampaign(currentPage + 1, rowsPerPage, searchValue)
+        } else {
+          handleConfirmCancel(row)
+        }
+    } else {
+        toast.error(<ToastContent message={response.data.message} />, { duration:3000 })  
+    }
+}).catch(() => {
+    setPauseLoad(false)
+    toast.error(<ToastContent message='Network Error' />, { duration:3000 })  
+
+})
+
+}
+
+ 
   const columns = [
     {
         name: 'Title',
@@ -348,8 +354,11 @@ const DashboardTable = () => {
               </DropdownToggle>
             <DropdownMenu end className= {index === 0 && campaignList.length === 1 ? 'notification-dropdown' : ''}>
                         {/* <DropdownItem className='w-100' onClick={() => getEditDetails(row)}><Edit2 size={18} className='me-50' />Edit</DropdownItem> */}
-                        <DropdownItem className='w-100 d-flex align-items-end' onClick={() => openDeleteModal(row)}><Trash size={15} className='me-50'/><span style={{lineHeight:'0.8'}}>Delete Scheduled Posts</span></DropdownItem>
-                        <DropdownItem className='w-100 d-flex align-items-end' onClick={() => handleConfirmCancel(row)}><Trash size={15} className='me-50'/><span style={{lineHeight:'0.8'}}>Delete Campaign</span></DropdownItem>
+                        {/* <DropdownItem className='w-100 d-flex align-items-end' onClick={() => openDeleteModal(row)}><Trash size={15} className='me-50'/><span style={{lineHeight:'0.8'}}>Delete Scheduled Posts</span></DropdownItem> */}
+                        {
+                          row.pause_status ? <DropdownItem className='w-100 d-flex align-items-end' onClick={() =>  handleConfirmCancel(row)}><Trash size={15} className='me-50'/><span style={{lineHeight:'0.8'}}>Delete Campaign</span></DropdownItem> : <DropdownItem className='w-100 d-flex align-items-end' onClick={() =>  handleStatus(row, 'delete')}><Trash size={15} className='me-50'/><span style={{lineHeight:'0.8'}}>Delete Campaign</span></DropdownItem> 
+
+                        }
                         <DropdownItem className='w-100 d-flex align-items-end' onClick={() => moveTo(row)}><Eye size={15} className='me-50'/><span style={{lineHeight:'1.2'}}>View Single Page</span></DropdownItem>
             </DropdownMenu>
             </UncontrolledDropdown>
@@ -411,7 +420,7 @@ const DashboardTable = () => {
         </div>
       </Card>
       <AddCampaign modalOpen={modalOpen} setModalOpen={setModalOpen} editData={editData} getCampaign={getCampaign} setEditData={setEditData} searchValue={searchValue} setSearchValue={setSearchValue} setCurrentPage={setCurrentPage} rowsPerPage={rowsPerPage}/>
-      <DeleteCampaign deleteModal={deleteModal} setDeleteModal={setDeleteModal} deleteUrl={deleteUrl} setDeleteUrl={setDeleteUrl} deleteId={deleteId}></DeleteCampaign>
+      <DeleteCampaign deleteModal={deleteModal} setDeleteModal={setDeleteModal} deleteUrl={deleteUrl} setDeleteUrl={setDeleteUrl} deleteId={null}></DeleteCampaign>
       {pauseLoad && <ComponentSpinner txt="Please Wait..."/>}
 
     </div>

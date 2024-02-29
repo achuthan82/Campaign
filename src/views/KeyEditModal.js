@@ -58,7 +58,7 @@ const KeyEditModal = ({keyModal, setKeyModal, aiDetails, getOpenApi}) => {
      const config = {
       method: m,
       url: api,
-      data:{name:details.name, selected_status:details.status.value, openai_api_key:details.api_key },
+      data:{name:details.name, selected_status:details.status.value, openai_api_key:details.api_key.replace(/\s+/g, ' ') },
       headers: { 
         Authorization: `Token ${token}`
       }
