@@ -136,7 +136,7 @@ const AddSite = ({siteModal, setSiteModal, getSiteDetails, editData, setEditData
                       rules={{
                         required: 'URL is required'
                         // pattern: {
-                        //   value: /^(ftp|http|https):\/\/[^ "]+\.com(\/|$)$/,
+                        //   value: /^(ftp|http|https):\/\/[^ "]+(\/|$)$/,
                         //   message: 'Invalid URL format'
                         // }
                       }}

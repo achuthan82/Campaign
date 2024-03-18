@@ -356,7 +356,7 @@ const Settings = () => {
             <Button color="primary" onClick={addOpen}><span className='me-50'><Plus size={15}/></span><span>Add New </span></Button>
             </div>
             </div>
-        <div className='react-dataTable'>
+        <div className='react-dataTable p-1'>
           <DataTable
             pagination
             paginationServer

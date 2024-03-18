@@ -214,10 +214,10 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
         } else {
           toast.error(<ToastContent message={response.data.message} />, { duration:3000 })  
         }
-      }).catch((error) => {
+      }).catch(() => {
         setCategoryLoading(false)
         setSiteLoading(false)
-        toast.error(<ToastContent message={error.message} />, { duration:3000 })  
+        toast.error(<ToastContent message="There is a critical error in this website" />, { duration:3000 })  
       })
     }
     useEffect(() => {
