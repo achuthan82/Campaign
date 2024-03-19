@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import { Copy, Delete, Edit, MoreVertical, ChevronDown, Plus, Trash } from 'react-feather'
+import { Copy, Delete, Edit, MoreVertical, ChevronDown, Plus, Trash, Linkedin } from 'react-feather'
 import { CardTitle, Card, CardBody, Badge, Label, Input, Row, Col, CardHeader, UncontrolledDropdown, DropdownItem, DropdownToggle, DropdownMenu, Button } from 'reactstrap'
 import DataTable from 'react-data-table-component'
 import KeyEditModal from './KeyEditModal'
@@ -14,6 +14,7 @@ import ReactPaginate from "react-paginate"
 import { TRUE } from 'sass'
 import Swal from "sweetalert2"
 import withReactContent from "sweetalert2-react-content"
+import AddLinkedinAccounts from './AddLinkedinAccounts'
 
 const ToastContent = ({ message = null }) => (
   <>
@@ -43,7 +44,7 @@ const Settings = () => {
     const [rowsPerPage, setRowsPerPage] = useState(10)
     const [currentPage, setCurrentPage] = useState(0)
     const [paginatedData, setPaginatedData] = useState(null)
-
+    const [linkedinModal, setLinkedinModal] = useState(false)
     const editOpen = (row) => {
        setEditData(row)
        setSiteModal(true)
@@ -376,8 +377,58 @@ const Settings = () => {
           />
         </div>
       </Card>
+      <Card>
+        <CardHeader className='border-bottom'>
+          <div className='d-flex align-items-end'>
+          <h4 className='d-inline me-50' style={{lineHeight:'2px'}}>LinkedIn Accounts</h4>
+          <span><Linkedin size={20} style={{stroke: '#462E95'}}/></span>
+          </div>
+        </CardHeader>
+            <div className='d-flex justify-content-between flex-wrap vertical-align-middle px-2 mt-50 mb-1'>
+            <div className='d-flex align-items-center'>
+              <Label for='sort-select' className='me-50'>show</Label>
+              <Input
+                // className='dataTable-select'
+                type='select'
+                id='sort-select'
+                onChange={e => handlePerPage(e)}
+              >
+                <option value={10}>10</option>
+                <option value={25}>25</option>
+                <option value={50}>50</option>
+                <option value={75}>75</option>
+                <option value={100}>100</option>
+              </Input>
+            </div>
+            <div className='d-flex align-items-end justify-content-sm-end mt-sm-0 mt-1'>
+            {/* <div className='me-1'>
+            <Input type="text" placeholder="Search by Name" value={searchValue} onChange={(event) => handleSearch(event) }></Input>
+            </div> */}
+            <Button color="primary" onClick={() => setLinkedinModal(true)}><span className='me-50'><Plus size={15}/></span><span>Add New Account</span></Button>
+            </div>
+            </div>
+        <div className='react-dataTable p-1'>
+          <DataTable
+            pagination
+            paginationServer
+            noHeader
+            className='react-dataTable'
+            columns={columns}
+            sortIcon={<ChevronDown size={10} />}
+            data={siteData}
+            progressPending={pending}
+            paginationComponent={
+              paginatedData &&
+              paginatedData.hasOwnProperty("pagination") &&
+              CustomPagination
+            }
+            paginationPerPage={rowsPerPage}
+            paginationDefaultPage={currentPage + 1}
+          />
+        </div>
+      </Card>
       {loading && <ComponentSpinner txt="Loading.."/>}
-
+    <AddLinkedinAccounts linkedinModal={linkedinModal}/>
     <KeyEditModal keyModal={keyModal} setKeyModal={setKeyModal} aiDetails={aiDetails} getOpenApi={getOpenApi}/>
     <AddSite siteModal={siteModal} setSiteModal={setSiteModal} getSiteDetails={getSiteDetails} editData={editData} setEditData={setEditData} searchValue={searchValue} setSearchValue={setSearchValue} setCurrentPage={setCurrentPage} rowsPerPage={rowsPerPage}/>
     </div>
