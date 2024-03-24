@@ -9,11 +9,11 @@ import { Sun, Moon, Menu } from "react-feather"
 
 // ** Reactstrap Imports
 import { NavItem, NavLink } from "reactstrap"
-
+import { getUserData } from "@utils"
 const ThemeNavbar = (props) => {
   // ** Props
   const { skin, setSkin, setMenuVisibility } = props
-
+  const userData = getUserData()
   // ** Function to toggle Theme (Light/Dark)
   /*const ThemeToggler = () => {
     if (skin === "dark") {
@@ -37,10 +37,11 @@ const ThemeNavbar = (props) => {
           </NavItem>
         </ul>
         <NavItem className="d-none d-lg-block">
-          <NavLink className="nav-link-style">
-            {/* <ThemeToggler /> */}
-          </NavLink>
+          <NavLink className="nav-link-style">{/* <ThemeToggler /> */}</NavLink>
         </NavItem>
+        {userData && userData.dt && (
+          <h5 className="text-primary fw-bolder mb-0">Welcome, <span className="text-capitalize">{userData.dt.first_name}</span></h5>
+        )}
       </div>
       <NavbarUser skin={skin} setSkin={setSkin} />
     </Fragment>

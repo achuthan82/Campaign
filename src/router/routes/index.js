@@ -20,6 +20,7 @@ import DashboardTable from "../../views/DashboardTable"
 import NewRegister from "../../views/NewRegister"
 import Token from "../../views/Token/Token"
 import CampaignDashboard from "../../views/CampaignDashboard"
+import AuthSuccess from "../../views/AuthSuccess"
 // import OrderSummary from "../../views/OrderSummary"
 // import OrderStates from "../../views/OrderStates"
 // import StateDetails from "../../views/StateDetails"
@@ -135,6 +136,13 @@ const Routes = [
   {
     path:'/new-user-register',
     element:<NewRegister/>,
+    meta: {
+      layout: "blank"
+    }
+  },
+  {
+    path:'/auth-success',
+    element:<AuthSuccess/>,
     meta: {
       layout: "blank"
     }

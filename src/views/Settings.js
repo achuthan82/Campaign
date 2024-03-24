@@ -45,6 +45,8 @@ const Settings = () => {
     const [currentPage, setCurrentPage] = useState(0)
     const [paginatedData, setPaginatedData] = useState(null)
     const [linkedinModal, setLinkedinModal] = useState(false)
+    const [linkedInData, setLinkedInData] = useState([])
+    console.log('linkedin', linkedInData)
     const editOpen = (row) => {
        setEditData(row)
        setSiteModal(true)
@@ -79,7 +81,8 @@ const Settings = () => {
         setPending(false)
         if (response.data.status === 200) {
            setPaginatedData(response.data)
-           setSiteData(response.data.data)
+           setSiteData(response.data.data.sites)
+           setLinkedInData(response.data.data.linkedin_list)
         } else if (response.data.status === 204) {
           setPaginatedData(null)
           setSiteData([])
@@ -242,7 +245,7 @@ const Settings = () => {
           cell: row => {
             console.log('row', row)
             return (
-                <span>
+                <span className='text-truncate'>
                   <a href={row.site_url} target="_blank">{row.site_url}</a>
                 </span>
             )
@@ -284,6 +287,69 @@ const Settings = () => {
         }
 
   ]
+  const linkedInColumns = [
+    {
+        name: 'Name',
+        selector: 'site_name',
+        sortable: true,
+        cell: row => {
+          console.log('row', row)
+          return (
+              <span className='text-truncate'>
+              {row.name}
+              </span>
+          )
+      }
+    },
+    {
+        name: 'email',
+        selector: 'site_url',
+        sortable: true,
+        cell: row => {
+          console.log('row', row)
+          return (
+              <span className='text-truncate'>
+                {row.email}
+              </span>
+          )
+      }
+    },
+    {
+        name: 'Status',
+        selector: 'status',
+        sortable: true,
+        cell: row => {
+            console.log('row', row)
+            return (
+                <span>
+                 <Badge color={row.is_active  ? 'light-success' : 'light-warning'}>{row.is_active ? 'Active' : 'Inactive'}</Badge>
+                </span>
+            )
+        }
+        // minWidth: '152px'
+    },
+    {
+        name: 'Action',
+        allowOverflow: true,
+        minWidth: '100px',
+        cell: (row) => {
+         console.log(row)
+          return (
+            <div className='d-flex align-items-center'>
+            <span className='me-1' style={{cursor:'pointer'}}><Edit size={15}/></span>
+             <span className='me-1' style={{cursor:'pointer'}}><Trash size={15}/></span> 
+
+            {/* <UncontrolledDropdown >
+              <DropdownToggle className='pr-1' tag='span' style={{cursor:'pointer'}}>
+                <MoreVertical size={15}  />
+              </DropdownToggle>
+            </UncontrolledDropdown> */}
+            </div>
+          )
+        }
+      }
+
+]
     const addOpen = () => {
       setEditData(null)
       setSiteModal(true)
@@ -413,9 +479,9 @@ const Settings = () => {
             paginationServer
             noHeader
             className='react-dataTable'
-            columns={columns}
+            columns={linkedInColumns}
             sortIcon={<ChevronDown size={10} />}
-            data={siteData}
+            data={linkedInData}
             progressPending={pending}
             paginationComponent={
               paginatedData &&
