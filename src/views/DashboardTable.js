@@ -422,7 +422,6 @@ const DashboardTable = () => {
       <AddCampaign modalOpen={modalOpen} setModalOpen={setModalOpen} editData={editData} getCampaign={getCampaign} setEditData={setEditData} searchValue={searchValue} setSearchValue={setSearchValue} setCurrentPage={setCurrentPage} rowsPerPage={rowsPerPage}/>
       <DeleteCampaign deleteModal={deleteModal} setDeleteModal={setDeleteModal} deleteUrl={deleteUrl} setDeleteUrl={setDeleteUrl} deleteId={null}></DeleteCampaign>
       {pauseLoad && <ComponentSpinner txt="Please Wait..."/>}
-
     </div>
   )
 }

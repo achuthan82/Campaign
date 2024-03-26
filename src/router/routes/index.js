@@ -141,7 +141,7 @@ const Routes = [
     }
   },
   {
-    path:'/auth-success',
+    path:'/auth-result',
     element:<AuthSuccess/>,
     meta: {
       layout: "blank"

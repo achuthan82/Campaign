@@ -50,6 +50,8 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
     const [questions, setQuestions] = useState('')
     const [formatQuestions, setFormatQuestion] = useState([])
     const [siteUrl, setSiteUrl] = useState('')
+    const [active, setActive] = useState(1)
+    const [accountOptions, setAccountOptions] = useState([])
     const { getRootProps, getInputProps } = useDropzone({
       onDrop: acceptedFiles => {
         console.log(acceptedFiles[0])
@@ -105,24 +107,27 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
       setLoading(true)
       console.log('data', data)
       const formData = new FormData()
+      if (active === 1) {
       const categoryData = data.category.map((item) => {
         return item.value
       })
       const categoryNameFilter = data.category.filter((item) => item.__isNew__)
-      // console.log(categoryNameFilter)
       const categoryName = categoryNameFilter.length > 0 ? categoryNameFilter.map((item) => {
         return item.value
       }) : ''
-      // formData.append("questions", formatQuestions.length > 0 ? formatQuestions.join('$$') : questions)
+      formData.append("category_id", categoryData)
+      formData.append("add_category", categoryName)
+      formData.append("settings_id", data.site.value)
+    } else {
+      formData.append("linkedin_id", data.site.value)
+    }
       formData.append("questions", questions)
       formData.append("prompt", data.prompt)
       formData.append("post_title", data.title)
       formData.append("campaign_title", data.campaign_title)
       formData.append("post_content", data.content)
-      formData.append("settings_id", data.site.value)
       formData.append("post_interval", data.interval.value)
-      formData.append("category_id", categoryData)
-      formData.append("add_category", categoryName)
+
       console.log('files', files)
       files.map((fl, idx) => {
         formData.append(`file${idx + 1}`, fl)
@@ -130,7 +135,7 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
       
       const config = {
         method: editData === null ? 'post' : 'put',
-        url: editData === null ?  `${apiConfig.api.url}campaign` : `${apiConfig.api.url}campaign/${editData.id}`,
+        url: active === 1 ?  `${apiConfig.api.url}campaign` : `${apiConfig.api.url}linkedin/campaign`,
         data:formData,
         headers: { 
           ContentType: "multipart/form-data",
@@ -164,11 +169,11 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
         toast.error(<ToastContent message={error.message} />, { duration:3000 })
       })
     }
-    const getSiteDetails = () => {
+    const getSiteDetails = (active) => {
       setSiteLoading(true)
       const config = {
         method: 'get',
-        url: `${apiConfig.api.url}site_settings`,
+        url: active === 1 ? `${apiConfig.api.url}site_settings` : `${apiConfig.api.url}linkedin`,
         headers: { 
           Authorization: `Token ${token}`
         }
@@ -178,13 +183,22 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
 
         setSiteLoading(false)
         if (response.data.status === 200) {
+          if (active === 1) {
           const formatData = response.data.data.map((item) => {
             return {label: item.site_name, value:item.id, url:item.site_url}
           })
           setSiteOptions(formatData)
-          console.log('site data', formatData)
+        } else {
+          const accountData = response.data.data.map((item) => {
+            return {label: item.name, value:item.id}
+          })
+          console.log('accountData', accountData, response.data.data)
+          setAccountOptions(accountData)
+        }
+          // console.log('site data', formatData)
         } else if (response.data.status === 204) {
           setSiteOptions([])
+          setAccountOptions([])
         } else {
           toast.error(<ToastContent message={response.data.message} />, { duration:3000 })  
         }
@@ -222,7 +236,7 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
     }
     useEffect(() => {
       if (modalOpen) {
-      getSiteDetails()
+      getSiteDetails(1)
       setTimeout(() => {
         window.scrollTo(0, 0)
       }, 3000)
@@ -320,8 +334,10 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
       console.log('questions', questions)
     }, [questions])
     const siteChange = (event) => {
+      if (active === 1) {
       console.log('site-event', event)
       setSiteUrl(event.url)
+      }
     }
 
   return (
@@ -339,12 +355,30 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
             </div>
             </div>
             <Row className='mb-1'>
+              <Col>
+              <div className='demo-inline-spacing'>
+                <div className='me-1 form-check form-check-primary'>
+                  <Input type='radio' id='radio-primary-1' name='ex1' onClick={() => { setActive(1); setValue('site', ''); getSiteDetails(1) }} defaultChecked />
+                  <Label className='form-check-label' for='radio-primary'>
+                    Create Wordpress Post
+                  </Label>
+                </div>
+                <div className='form-check form-check-primary'>
+                  <Input type='radio' id='radio-primary-2' name='ex1' onClick={() => { setActive(2); setValue('site', ''); getSiteDetails(2) }} />
+                  <Label className='form-check-label' for='radio-primary'>
+                    Create LinkedIn Post
+                  </Label>
+                </div>
+            </div>
+              </Col>
+            </Row>
+            <Row className='mb-1'>
                 <Col>
-                <Label>Choose Site<span className='text-danger'>*</span></Label>
+                <Label>{active === 1 ? 'Choose Site' : 'Choose Account'}<span className='text-danger'>*</span></Label>
                 <Controller
                   control={control}
                   name="site"
-                  rules={{ required: "Site details is required" }}
+                  rules={{ required: active === 1 ? "Site details is required" : "Account Details is required" }}
                   render={({ field }) => (
                     <>
                       <Select
@@ -352,7 +386,7 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
                         isLoading={siteLoading}
                         placeholder={siteLoading ? 'Loading...' : 'Select..'}
                         autoFocus
-                        options={siteOptions}
+                        options={active === 1 ? siteOptions : accountOptions}
                         id="site"
                         invalid={errors.site}
                         onChange={(event) => {
@@ -366,7 +400,7 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
                     </>
                   )}
                 />
-              </Col>
+               </Col>
             </Row>
             <Row className='mb-1'>
                 <Col>
@@ -396,41 +430,44 @@ const AddCampaign = ({modalOpen, setModalOpen, editData, getCampaign, setEditDat
                 </Col>
             </Row>
             <Row className='mb-1'>
-                <Col>
-                  <div className='d-flex justify-content-between'>
-                   <Label>Categories<span className='text-danger'>*</span></Label>
-                   <h6 className='card-text-log'>Create Categories if not existing</h6>
-                  </div>
-                  <Controller
-                  control={control}
-                  name="category"
-                  rules={{ required: "Category details is required" }}
-                  render={({ field }) => (
-                    <>
-                      <CreatableSelect
-                        theme={selectThemeColors}
-                        isLoading={categoryLoading}
-                        placeholder={categoryLoading ? 'Loading...' : 'Select..'}
-                        isMulti
-                        {...field}
-                        autoFocus
-                        options={categoryOptions}
-                        id="category"
-                        invalid={errors.category}
-                        onChange={(event) => {
-                          field.onChange(event)
-                        }}
-                      ></CreatableSelect>
-                      {errors.category && (
-                        <p className="text-danger">{errors.category.message}</p>
-                      )}
-                      {
-                        siteUrl === '' && <p className='text-warning'>Please choose a site to continue </p>
-                      }
-                    </>
-                  )}
-                />
-                </Col>
+              {
+                active === 1 && <Col>
+                <div className='d-flex justify-content-between'>
+                 <Label>Categories<span className='text-danger'>*</span></Label>
+                 <h6 className='card-text-log'>Create Categories if not existing</h6>
+                </div>
+                <Controller
+                control={control}
+                name="category"
+                rules={{ required: "Category details is required" }}
+                render={({ field }) => (
+                  <>
+                    <CreatableSelect
+                      theme={selectThemeColors}
+                      isLoading={categoryLoading}
+                      placeholder={categoryLoading ? 'Loading...' : 'Select..'}
+                      isMulti
+                      {...field}
+                      autoFocus
+                      options={categoryOptions}
+                      id="category"
+                      invalid={errors.category}
+                      onChange={(event) => {
+                        field.onChange(event)
+                      }}
+                    ></CreatableSelect>
+                    {errors.category && (
+                      <p className="text-danger">{errors.category.message}</p>
+                    )}
+                    {
+                      siteUrl === '' && <p className='text-warning'>Please choose a site to continue </p>
+                    }
+                  </>
+                )}
+              />
+              </Col>
+              }
+                
             </Row>
             <Row className='mb-1'>
                 <Col>

@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import { Copy, Delete, Edit, MoreVertical, ChevronDown, Plus, Trash, Linkedin } from 'react-feather'
+import { Copy, Delete, Edit, MoreVertical, ChevronDown, Plus, Trash, Linkedin, Check, X } from 'react-feather'
 import { CardTitle, Card, CardBody, Badge, Label, Input, Row, Col, CardHeader, UncontrolledDropdown, DropdownItem, DropdownToggle, DropdownMenu, Button } from 'reactstrap'
 import DataTable from 'react-data-table-component'
 import KeyEditModal from './KeyEditModal'
@@ -30,6 +30,18 @@ const ToastContent = ({ message = null }) => (
     )}
   </>
 )
+const CustomLabel = ({ htmlFor }) => {
+  return (
+    <Label className='form-check-label' htmlFor={htmlFor}>
+      <span className='switch-icon-left'>
+        <Check size={14} />
+      </span>
+      <span className='switch-icon-right'>
+        <X size={14} />
+      </span>
+    </Label>
+  )
+}
 const Settings = () => {
     const token = getToken()
     const MySwal = withReactContent(Swal)
@@ -44,8 +56,12 @@ const Settings = () => {
     const [rowsPerPage, setRowsPerPage] = useState(10)
     const [currentPage, setCurrentPage] = useState(0)
     const [paginatedData, setPaginatedData] = useState(null)
+    const [linkedinRowsPerPage, setLinkedinRowsPerPage] = useState(10)
+    const [linkedinCurrentPage, setLinkedInCurrentPage] = useState(0)
+    const [linkedinPaginatedData, setLinkedinPaginatedData] = useState(null)
     const [linkedinModal, setLinkedinModal] = useState(false)
     const [linkedInData, setLinkedInData] = useState([])
+    const [linkedinPending, setLinkedinPending] = useState(false)
     console.log('linkedin', linkedInData)
     const editOpen = (row) => {
        setEditData(row)
@@ -81,8 +97,7 @@ const Settings = () => {
         setPending(false)
         if (response.data.status === 200) {
            setPaginatedData(response.data)
-           setSiteData(response.data.data.sites)
-           setLinkedInData(response.data.data.linkedin_list)
+           setSiteData(response.data.data)
         } else if (response.data.status === 204) {
           setPaginatedData(null)
           setSiteData([])
@@ -91,6 +106,32 @@ const Settings = () => {
         }
       }).catch((error) => {
         setPending(false)
+        toast.error(<ToastContent message={error.message} />, { duration:3000 })  
+      })
+    }
+    const getLinkedInList = (page, per_page) => {
+      setLinkedinPending(true)
+      const config = {
+        method: 'get',
+        url: `${apiConfig.api.url}linkedin/list?page=${page}&per_page=${per_page}&time_zone=asia/kolkata`,
+        headers: { 
+          Authorization: `Token ${token}`
+        }
+      }
+      axios(config).then((response) => {
+        console.log('response', response)
+        setLinkedinPending(false)
+        if (response.data.status === 200) {
+          setLinkedinPaginatedData(response.data)
+          setLinkedInData(response.data.data)
+        } else if (response.data.status === 204) {
+          setLinkedinPaginatedData(null)
+          setLinkedInData([])
+        } else {
+          toast.error(<ToastContent message={response.data.message} />, { duration:3000 })  
+        }
+      }).catch((error) => {
+        setLinkedinPending(false)
         toast.error(<ToastContent message={error.message} />, { duration:3000 })  
       })
     }
@@ -119,7 +160,7 @@ const Settings = () => {
       })
     }
   
-    const handleDelete = (id) => {
+    const handleDelete = (id, text) => {
       return MySwal.fire({
         title: "Are you sure?",
         text: "You want to delete!",
@@ -136,7 +177,7 @@ const Settings = () => {
        
           const config = {
             method: "delete",
-            url: `${apiConfig.api.url}site_settings/${id}`,
+            url: text !== 'linkedin' ? `${apiConfig.api.url}site_settings/${id}` : `${apiConfig.api.url}linkedin/delete/${id}`,
             headers: {
               ContentType: "application/json",
               Authorization: `Token ${token}`
@@ -147,8 +188,13 @@ const Settings = () => {
             .then((response) => {
               console.log(response.data.status)
               if (response.data.status === 200) {
+                if (text !== 'linkedin') {
                 setCurrentPage(0)
                 getSiteDetails(1, rowsPerPage, searchValue)
+                } else {
+                  setLinkedInCurrentPage(0)
+                  getLinkedInList(1, linkedinRowsPerPage)
+                }
                 MySwal.fire({
                   icon: "success",
                   title: "Deleted!",
@@ -172,7 +218,7 @@ const Settings = () => {
             })
             .catch((error) => {
               console.log(error)
-              toast.error(<ToastContent message={response.data.message} />, { duration:3000 })  
+              toast.error(<ToastContent message={error.message} />, { duration:3000 })  
             })
         } else if (result.dismiss === MySwal.DismissReason.cancel) {
           MySwal.fire({
@@ -198,12 +244,24 @@ const Settings = () => {
       setCurrentPage(page.selected)
       getSiteDetails(page.selected + 1, rowsPerPage, searchValue)
     }
+    const handleLinkedInPagination = (page) => {
+      setLinkedInCurrentPage(page.selected)
+      getLinkedInList(page.selected + 1, linkedinRowsPerPage)
+    }
   
     const handlePerPage = (event) => {
       setCurrentPage(0)
       setRowsPerPage(parseInt(event.target.value))
       setTimeout(() => {
         getSiteDetails(1, event.target.value, searchValue)
+      }, 300)
+    }
+    const handleLinkedInPerPage = (event) => {
+      setLinkedInCurrentPage(0)
+      setLinkedinRowsPerPage(parseInt(event.target.value))
+      // setLinkedInRowsPerPage(parseInt(event.target.value))
+      setTimeout(() => {
+        getLinkedInList(1, event.target.value)
       }, 300)
     }
 
@@ -232,6 +290,52 @@ const Settings = () => {
         containerClassName="pagination react-paginate separated-pagination pagination-sm justify-content-end pe-1 mt-1"
       />
     )
+    const LinkedinCustomPagination = () => (
+      <ReactPaginate
+        previousLabel=""
+        nextLabel=""
+        forcePage={linkedinCurrentPage}
+        onPageChange={(page) => handleLinkedInPagination(page)}
+        pageCount={
+          linkedinPaginatedData &&
+          (Math.ceil(linkedinPaginatedData.pagination.total / rowsPerPage) || 1)
+        }
+        breakLabel="..."
+        pageRangeDisplayed={2}
+        marginPagesDisplayed={2}
+        activeClassName="active"
+        pageClassName="page-item"
+        breakClassName="page-item"
+        nextLinkClassName="page-link"
+        pageLinkClassName="page-link"
+        breakLinkClassName="page-link"
+        previousLinkClassName="page-link"
+        nextClassName="page-item next-item"
+        previousClassName="page-item prev-item"
+        containerClassName="pagination react-paginate separated-pagination pagination-sm justify-content-end pe-1 mt-1"
+      />
+    )
+    const handleStatus = (row) => {
+      const config = {
+        method: 'put',
+        url: `${apiConfig.api.url}linkedin/update-status/${row.id}`,
+        data: {is_active: !row.is_active}
+    }
+    axios(config).then((response) => {
+      if (response.data.status === 200) {
+          toast.success(<ToastContent message={response.data.message} />, { duration:3000 })
+          // setCurrentPage(0) 
+          // getSiteDetails(currentPage + 1, rowsPerPage, searchValue)
+          getLinkedInList(linkedinCurrentPage + 1, linkedinRowsPerPage)
+      } else {
+          toast.error(<ToastContent message={response.data.message} />, { duration:3000 })  
+      }
+  }).catch(() => {
+      toast.error(<ToastContent message='Network Error' />, { duration:3000 })  
+
+  })
+
+  }
     const columns = [
       {
           name: 'Name',
@@ -315,16 +419,18 @@ const Settings = () => {
       }
     },
     {
-        name: 'Status',
+        name: 'Activate/Inactivate',
         selector: 'status',
         sortable: true,
         cell: row => {
-            console.log('row', row)
-            return (
-                <span>
-                 <Badge color={row.is_active  ? 'light-success' : 'light-warning'}>{row.is_active ? 'Active' : 'Inactive'}</Badge>
-                </span>
-            )
+          return (
+      <div className='d-flex flex-column'>
+          <div className='form-switch form-check-success'>
+          <Input type='switch' checked = {row.is_active} onClick={() => handleStatus(row)} id={`switch_${row.id}`} name={`switch_${row.id}`} />
+          <CustomLabel htmlFor={`switch_${row.id}`} />
+          </div>
+      </div>
+          )
         }
         // minWidth: '152px'
     },
@@ -336,8 +442,8 @@ const Settings = () => {
          console.log(row)
           return (
             <div className='d-flex align-items-center'>
-            <span className='me-1' style={{cursor:'pointer'}}><Edit size={15}/></span>
-             <span className='me-1' style={{cursor:'pointer'}}><Trash size={15}/></span> 
+            {/* <span className='me-1' style={{cursor:'pointer'}}><Edit size={15}/></span> */}
+             <span className='me-1' style={{cursor:'pointer'}} onClick={() => handleDelete(row.id, 'linkedin')}><Trash size={15}/></span> 
 
             {/* <UncontrolledDropdown >
               <DropdownToggle className='pr-1' tag='span' style={{cursor:'pointer'}}>
@@ -360,6 +466,7 @@ const Settings = () => {
     }
     useEffect(() => {
       getSiteDetails(1, 10, '')
+      getLinkedInList(1, 10)
       getOpenApi()
     }, [])
   return (
@@ -457,7 +564,7 @@ const Settings = () => {
                 // className='dataTable-select'
                 type='select'
                 id='sort-select'
-                onChange={e => handlePerPage(e)}
+                onChange={e => handleLinkedInPerPage(e)}
               >
                 <option value={10}>10</option>
                 <option value={25}>25</option>
@@ -482,19 +589,19 @@ const Settings = () => {
             columns={linkedInColumns}
             sortIcon={<ChevronDown size={10} />}
             data={linkedInData}
-            progressPending={pending}
+            progressPending={linkedinPending}
             paginationComponent={
-              paginatedData &&
-              paginatedData.hasOwnProperty("pagination") &&
-              CustomPagination
+              linkedinPaginatedData &&
+              linkedinPaginatedData.hasOwnProperty("pagination") &&
+              LinkedinCustomPagination
             }
-            paginationPerPage={rowsPerPage}
-            paginationDefaultPage={currentPage + 1}
+            paginationPerPage={linkedinRowsPerPage}
+            paginationDefaultPage={linkedinCurrentPage + 1}
           />
         </div>
       </Card>
       {loading && <ComponentSpinner txt="Loading.."/>}
-    <AddLinkedinAccounts linkedinModal={linkedinModal}/>
+    <AddLinkedinAccounts linkedinModal={linkedinModal} setLinkedinModal={setLinkedinModal}/>
     <KeyEditModal keyModal={keyModal} setKeyModal={setKeyModal} aiDetails={aiDetails} getOpenApi={getOpenApi}/>
     <AddSite siteModal={siteModal} setSiteModal={setSiteModal} getSiteDetails={getSiteDetails} editData={editData} setEditData={setEditData} searchValue={searchValue} setSearchValue={setSearchValue} setCurrentPage={setCurrentPage} rowsPerPage={rowsPerPage}/>
     </div>

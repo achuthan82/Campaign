@@ -32,7 +32,7 @@ const ToastContent = ({ message = null }) => (
     )}
   </>
 )
-const AddLinkedinAccounts = ({ linkedinModal }) => {
+const AddLinkedinAccounts = ({ linkedinModal, setLinkedinModal }) => {
   const form = useForm()
   const token = getToken()
   const [loading, setLoading] = useState(false)
@@ -40,7 +40,7 @@ const AddLinkedinAccounts = ({ linkedinModal }) => {
   const {
     control,
     handleSubmit,
-    // setValue,
+    setValue,
     formState: { errors }
   } = form
   const addAccount = (data) => {
@@ -56,17 +56,21 @@ const AddLinkedinAccounts = ({ linkedinModal }) => {
     }
     axios(config).then((response) => {
       console.log('response', response)
-      setLoading(false)
       if (response.data.status === 200) {
           window.location.href = response.data.redirect_url
 
       } else {
+        setLoading(false)
         toast.error(<ToastContent message={response.data.message} />, { duration:3000 }) 
       }
     }).catch((error) => {
       setLoading(false)
       toast.error(<ToastContent message={error.message} />, { duration:3000 }) 
     })
+  }
+  const close = () => {
+    setLinkedinModal(false)
+    setValue('loginEmail', '')
   }
   return (
     <div>
@@ -113,7 +117,7 @@ const AddLinkedinAccounts = ({ linkedinModal }) => {
           </ModalBody>
           <ModalFooter className="d-flex justify-content-center">
             <Button color="primary" type='submit' disabled={loading}>{loading && <Spinner size="sm" className='me-50' />}Add</Button>
-            <Button color="secondary">Cancel</Button>
+            <Button color="secondary" onClick={close}>Cancel</Button>
             {/* <Button color='primary' type="submit" disabled={loading}>{loading && <Spinner size="sm" className='me-50' />} Submit</Button>
             <Button onClick={close}>Cancel</Button> */}
           </ModalFooter>
